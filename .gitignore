@@ -1,0 +1,15 @@
+/.mvn
+/mvnw.cmd
+/mvnw
+target/
+.idea/
+*.iml
+build/
+.settings/
+.classpath
+.project
+.DS_Store
+*.log
+*.log.*
+#src/main/resources/db.properties
+webapp/resources/css/*.css
