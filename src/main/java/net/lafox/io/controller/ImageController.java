@@ -9,11 +9,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("api")
-public class ImageRestController {
+public class ImageController {
 
     @RequestMapping(value = "test")
     public Object test(HttpServletRequest request) {
-        Map<String, Object> map=new HashMap<>();
+        Map<String, Object> map = new HashMap<>();
         map.put("1", "1");
         map.put("2", "2");
         map.put("isAlive", "yes");

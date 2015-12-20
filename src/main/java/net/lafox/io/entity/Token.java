@@ -1,27 +1,36 @@
 package net.lafox.io.entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.UUID;
 
 @Entity
-@Table(name="token")
-public class Token implements Serializable{
+@Table(name = "token")
+public class Token implements Serializable {
     private static final long serialVersionUID = 495411682022208001L;
     @Id
-    private long id;
+    @GeneratedValue
+    private Long id;
     private String token;
     private String siteName;
     private String ownerName;
+    private Long ownerId;
     private String ip;
-    private Date created=new Date();
+    private Date created = new Date();
 
-    public long getId() {
-        return id;
+    public Token(String siteName, String ownerName, Long ownerId, String ip) {
+        this.siteName = siteName;
+        this.ownerName = ownerName;
+        this.ownerId = ownerId;
+        this.ip = ip;
+        this.token = UUID.randomUUID().toString();
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public Token() {
     }
 
     public String getToken() {
@@ -48,6 +57,14 @@ public class Token implements Serializable{
         this.ownerName = ownerName;
     }
 
+    public Long getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
+    }
+
     public String getIp() {
         return ip;
     }
@@ -64,4 +81,11 @@ public class Token implements Serializable{
         this.created = created;
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 }

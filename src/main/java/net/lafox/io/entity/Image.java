@@ -1,13 +1,16 @@
 package net.lafox.io.entity;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name="image")
-public class Image implements Serializable{
+@Table(name = "image")
+public class Image implements Serializable {
 
     private static final long serialVersionUID = 679756698908629665L;
     @Id
@@ -29,7 +32,9 @@ public class Image implements Serializable{
     private int size;
 
     @PreUpdate
-    public void setLastUpdate() {  this.modified = new Date(); }
+    public void setLastUpdate() {
+        this.modified = new Date();
+    }
 
     public long getId() {
         return id;
