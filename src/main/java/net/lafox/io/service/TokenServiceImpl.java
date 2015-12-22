@@ -2,6 +2,7 @@ package net.lafox.io.service;
 
 import net.lafox.io.dao.TokenDao;
 import net.lafox.io.entity.Token;
+import net.lafox.io.exceptions.EmptyFieldException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,11 @@ public class TokenServiceImpl implements TokenService {
     TokenDao tokenDao;
 
     @Override
-    public String addToken(String siteName, String ownerName, Long ownerId, String ip) {
+    public String addToken(String siteName, String ownerName, Long ownerId, String ip) throws EmptyFieldException {
+
+        if (siteName==null || siteName.isEmpty()|| ownerName==null || ownerName.isEmpty() || ownerId==null || ownerId==0)
+            throw new EmptyFieldException();
+
         Token token = tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId);
         if (token == null) {
             token = new Token(siteName, ownerName, ownerId, ip);
