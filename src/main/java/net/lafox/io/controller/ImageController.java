@@ -14,13 +14,13 @@ public class ImageController {
     @RequestMapping(value = "test")
     public Object test(HttpServletRequest request) {
         Map<String, Object> map = new HashMap<>();
-        map.put("1", "1");
-        map.put("2", "2");
         map.put("isAlive", "yes");
         map.put("isAliveBool", true);
         return map;
 
     }
 
+
+//TODO @RequestMapping(value = "/upload", method = RequestMethod.POST)
 
 }

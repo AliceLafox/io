@@ -1,5 +1,6 @@
-package net.lafox.io;
+package net.lafox.io.controller;
 
+import net.lafox.io.IoApplication;
 import net.lafox.io.service.TokenService;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +16,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @SpringApplicationConfiguration(classes = IoApplication.class)
 @ActiveProfiles( profiles={"test"})
 @WebAppConfiguration
-public class IoApplicationTests {
+public class TokenControllerTests {
     @Autowired
     WebApplicationContext webApplicationContext;
 
@@ -36,16 +36,6 @@ public class IoApplicationTests {
     @Before
     public void setUp() {
         mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
-
-    @Test
-    public void testApiResponse() throws Exception {
-        mockMvc.perform(get("/image/test"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.isAlive").value("yes"))
-                .andExpect(jsonPath("$.isAliveBool").value(true))
-        ;
     }
 
     @Test
