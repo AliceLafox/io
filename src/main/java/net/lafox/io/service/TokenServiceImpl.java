@@ -19,7 +19,7 @@ public class TokenServiceImpl implements TokenService {
     public String addToken(String siteName, String ownerName, Long ownerId, String ip) throws EmptyFieldException {
 
         if (siteName==null || siteName.isEmpty()|| ownerName==null || ownerName.isEmpty() || ownerId==null || ownerId==0)
-            throw new EmptyFieldException();
+            throw new EmptyFieldException("rejected: required parameters are empty");
 
         Token token = tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId);
         if (token == null) {

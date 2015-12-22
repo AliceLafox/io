@@ -7,11 +7,14 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.context.WebApplicationContext;
 
+import static org.junit.matchers.JUnitMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -19,6 +22,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = IoApplication.class)
+@ActiveProfiles( profiles={"test"})
 @WebAppConfiguration
 public class IoApplicationTests {
     @Autowired
@@ -36,7 +40,7 @@ public class IoApplicationTests {
 
     @Test
     public void testApiResponse() throws Exception {
-        mockMvc.perform(get("/api/test"))
+        mockMvc.perform(get("/image/test"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.isAlive").value("yes"))
@@ -72,5 +76,25 @@ public class IoApplicationTests {
                 .andExpect(jsonPath("$.token").value(token))
         ;
     }
+
+    @Test
+    public void testEmptyFieldsWhenAddToken() throws Exception {
+        mockMvc.perform(post("/api/token/add"))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().reason(containsString("Required String parameter")))
+                .andExpect(status().reason("Required String parameter 'siteName' is not present"))
+        ;
+
+        mockMvc.perform(post("/api/token/add")
+                        .param("siteName", "")
+                        .param("ownerName", "")
+                        .param("ownerId", "0")
+        )
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andExpect(jsonPath("$.details").value("rejected: required parameters are empty"))
+;
+    }
+
+
 
 }
