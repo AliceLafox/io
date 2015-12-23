@@ -11,6 +11,11 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Created by Alice Lafox <alice@lafox.net> on 22.12.15
+ * Lafox.Net Software Developers Team http://dev.lafox.net
+ */
+
 @RestController
 @RequestMapping("api/token")
 public class TokenController {
@@ -19,7 +24,10 @@ public class TokenController {
     TokenService tokenService;
 
     @RequestMapping(value = "add", method = RequestMethod.POST)
-    public Object add(HttpServletRequest request, @RequestParam String siteName, @RequestParam String ownerName, @RequestParam Long ownerId) {
+    public Object add(HttpServletRequest request,
+                      @RequestParam(defaultValue = "") String siteName,
+                      @RequestParam(defaultValue = "") String ownerName,
+                      @RequestParam(defaultValue = "0") Long ownerId) {
         Map<String, Object> map = new HashMap<>();
         try {
             map.put("token", tokenService.addToken(siteName, ownerName, ownerId, request.getRemoteAddr()));

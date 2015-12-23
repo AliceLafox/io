@@ -8,6 +8,11 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
+/**
+ * Created by Alice Lafox <alice@lafox.net> on 20.12.15
+ * Lafox.Net Software Developers Team http://dev.lafox.net
+ */
+
 @Entity
 @Table(name = "token")
 public class Token implements Serializable {

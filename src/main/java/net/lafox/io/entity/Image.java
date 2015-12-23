@@ -1,12 +1,14 @@
 package net.lafox.io.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
+
+/**
+ * Created by Alice Lafox <alice@lafox.net> on 20.12.15
+ * Lafox.Net Software Developers Team http://dev.lafox.net
+ */
 
 @Entity
 @Table(name = "image")
@@ -14,6 +16,7 @@ public class Image implements Serializable {
 
     private static final long serialVersionUID = 679756698908629665L;
     @Id
+    @GeneratedValue
     private long id;
 
     @NotNull
@@ -29,12 +32,27 @@ public class Image implements Serializable {
     private String fileName;
     private String title;
     private String description;
-    private int size;
+    private Long size;
 
     @PreUpdate
     public void setLastUpdate() {
         this.modified = new Date();
     }
+
+    public Image(Token token) {
+        this.token = token;
+    }
+
+    public Image(Token token, String contentType, String fileName, Long size) {
+        this.token = token;
+        this.contentType = contentType;
+        this.fileName = fileName;
+        this.size = size;
+    }
+
+    public Image() {
+    }
+
 
     public long getId() {
         return id;
@@ -132,11 +150,7 @@ public class Image implements Serializable {
         this.description = description;
     }
 
-    public int getSize() {
-        return size;
-    }
-
-    public void setSize(int size) {
+    public void setSize(Long size) {
         this.size = size;
     }
 }

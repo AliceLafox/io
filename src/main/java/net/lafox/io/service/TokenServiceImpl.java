@@ -5,8 +5,12 @@ import net.lafox.io.entity.Token;
 import net.lafox.io.exceptions.EmptyFieldException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
+/**
+ * Created by Alice Lafox <alice@lafox.net> on 23.12.15
+ * Lafox.Net Software Developers Team http://dev.lafox.net
+ */
 
 @Service
 @Transactional
@@ -32,5 +36,10 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String findBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId) {
         return tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId).getToken();
+    }
+
+    @Override
+    public Token findByToken(String token) {
+        return tokenDao.findByToken(token);
     }
 }
