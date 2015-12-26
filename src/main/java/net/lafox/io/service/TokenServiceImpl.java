@@ -2,7 +2,7 @@ package net.lafox.io.service;
 
 import net.lafox.io.dao.TokenDao;
 import net.lafox.io.entity.Token;
-import net.lafox.io.exceptions.EmptyFieldException;
+import net.lafox.io.exceptions.RollBackException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,17 +13,17 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Service
-@Transactional
+@Transactional(rollbackFor = RollBackException.class)
 public class TokenServiceImpl implements TokenService {
 
     @Autowired
     TokenDao tokenDao;
 
     @Override
-    public String addToken(String siteName, String ownerName, Long ownerId, String ip) throws EmptyFieldException {
+    public String addToken(String siteName, String ownerName, Long ownerId, String ip) throws RollBackException {
 
         if (siteName==null || siteName.isEmpty()|| ownerName==null || ownerName.isEmpty() || ownerId==null || ownerId==0)
-            throw new EmptyFieldException("rejected: required parameters are empty");
+            throw new RollBackException("rejected: required parameters are empty");
 
         Token token = tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId);
         if (token == null) {

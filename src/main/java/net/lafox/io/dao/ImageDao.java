@@ -12,5 +12,7 @@ import java.util.List;
  */
 
 public interface ImageDao extends JpaRepository<Image, Long> {
-    List<Image> findByToken(Token token);
+    List<Image> findByTokenOrderBySortIndex(Token token);
+
+//    Image findByTokenAndIsAvatarIsTrue(Token token); //TODo
 }

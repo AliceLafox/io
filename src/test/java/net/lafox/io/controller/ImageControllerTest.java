@@ -59,7 +59,7 @@ public class ImageControllerTest {
     public void testImageUpload() throws Exception {
         String siteName = "lafox.net";
         String ownerName = "item";
-        Long ownerId = 100L;
+        Long ownerId = 102L;
         String ip = "10.10.10.10";
         String token = tokenService.addToken(siteName, ownerName, ownerId, ip);
 
@@ -73,8 +73,8 @@ public class ImageControllerTest {
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.images").isNotEmpty())
         ;
     }
+
 
 }

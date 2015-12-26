@@ -3,10 +3,9 @@ package net.lafox.io.service;
 
 import net.lafox.io.entity.Image;
 import net.lafox.io.entity.Token;
-import net.lafox.io.exceptions.EmptyFieldException;
+import net.lafox.io.exceptions.RollBackException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -15,7 +14,6 @@ import java.util.List;
  */
 
 public interface ImageService {
-    List<Image> findByToken(Token token);
-
-    List<Image> upload(String token, MultipartFile mpf) throws IOException, EmptyFieldException;
+    List<Image> getImages(Token token);
+    Long upload(String token, MultipartFile mpf) throws RollBackException;
 }

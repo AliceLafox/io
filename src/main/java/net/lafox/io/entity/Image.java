@@ -17,9 +17,10 @@ public class Image implements Serializable {
     private static final long serialVersionUID = 679756698908629665L;
     @Id
     @GeneratedValue
-    private long id;
+    private Long id;
 
     @NotNull
+    @ManyToOne
     private Token token;
 
     private int sortIndex;
@@ -54,11 +55,11 @@ public class Image implements Serializable {
     }
 
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -150,7 +151,12 @@ public class Image implements Serializable {
         this.description = description;
     }
 
+    public Long getSize() {
+        return size;
+    }
+
     public void setSize(Long size) {
         this.size = size;
     }
+
 }

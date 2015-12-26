@@ -3,7 +3,7 @@ package net.lafox.io.service;
 import net.lafox.io.dao.ImageDao;
 import net.lafox.io.entity.Image;
 import net.lafox.io.entity.Token;
-import net.lafox.io.exceptions.EmptyFieldException;
+import net.lafox.io.exceptions.RollBackException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 
 @Service
-@Transactional
+@Transactional(rollbackFor = RollBackException.class)
 public class ImageServiceImpl implements ImageService {
     @Value("${upload.dir}")
     private String UPLOAD_DIR;
@@ -30,24 +30,27 @@ public class ImageServiceImpl implements ImageService {
     @Autowired
     TokenService tokenService;
 
+
     @Override
-    public List<Image> findByToken(Token token) {
-        return imageDao.findByToken(token);
+    public List<Image> getImages(Token token) {
+        return imageDao.findByTokenOrderBySortIndex(token);
     }
 
+
     @Override
-    public List<Image> upload(String token, MultipartFile mpf) throws EmptyFieldException, IOException {
+    public Long upload(String token, MultipartFile mpf) throws RollBackException {
 
         Token checkedToken = tokenService.findByToken(token);
-        if (checkedToken == null) throw new EmptyFieldException("token not found");
-
-        List<Image> list = this.findByToken(checkedToken);
+        if (checkedToken == null) throw new RollBackException("token not found");
 
         Image image = new Image(checkedToken,mpf.getOriginalFilename(),mpf.getContentType(),mpf.getSize());
         imageDao.save(image);
 
-        mpf.transferTo(new File(UPLOAD_DIR + "/" + checkedToken.getSiteName() + "/" + image.getId()));
-        list.add(image);
-        return list;
+        try {
+            mpf.transferTo(new File(UPLOAD_DIR + "/" + checkedToken.getSiteName() + "/" + image.getId()));
+        } catch (IOException e) {
+            throw new RollBackException(e);
+        }
+        return image.getId();
     }
 }

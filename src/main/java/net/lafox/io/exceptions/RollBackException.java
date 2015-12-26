@@ -5,8 +5,12 @@ package net.lafox.io.exceptions;
  * Lafox.Net Software Developers Team http://dev.lafox.net
  */
 
-public class EmptyFieldException extends Exception {
-    public EmptyFieldException(String message) {
+public class RollBackException extends Exception {
+    public RollBackException(String message) {
         super(message);
+    }
+
+    public RollBackException(Throwable cause) {
+        super(cause);
     }
 }

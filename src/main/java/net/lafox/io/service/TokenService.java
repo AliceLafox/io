@@ -2,7 +2,7 @@ package net.lafox.io.service;
 
 
 import net.lafox.io.entity.Token;
-import net.lafox.io.exceptions.EmptyFieldException;
+import net.lafox.io.exceptions.RollBackException;
 
 /**
  * Created by Alice Lafox <alice@lafox.net> on 22.12.15
@@ -10,7 +10,7 @@ import net.lafox.io.exceptions.EmptyFieldException;
  */
 
 public interface TokenService {
-    String addToken(String siteName, String ownerName, Long ownerId, String ip) throws EmptyFieldException;
+    String addToken(String siteName, String ownerName, Long ownerId, String ip) throws RollBackException;
 
     String findBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId);
 

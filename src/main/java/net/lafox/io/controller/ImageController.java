@@ -1,6 +1,6 @@
 package net.lafox.io.controller;
 
-import net.lafox.io.exceptions.EmptyFieldException;
+import net.lafox.io.exceptions.RollBackException;
 import net.lafox.io.service.ImageService;
 import net.lafox.io.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +32,19 @@ public class ImageController {
     @Autowired
     TokenService tokenService;
 
+
+
+    @RequestMapping(value = "update/{id}", method = RequestMethod.POST)
+    public synchronized void update(MultipartHttpServletRequest request,
+                                                   HttpServletResponse response,
+                                                   @RequestParam(defaultValue = "") String token,
+                                                   @RequestParam(value = "data", required = false) List<MultipartFile> files
+    ) {
+
+    }
+
+
+
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     public synchronized Map<String, Object> upload(MultipartHttpServletRequest request,
                                                    HttpServletResponse response,
@@ -40,18 +52,13 @@ public class ImageController {
                                                    @RequestParam(value = "data", required = false) List<MultipartFile> files
     ) {
         Map<String, Object> map = new HashMap<>();
-
+        map.put("status", "OK");
         for (MultipartFile mpf : files) {
             try {
-                map.put("status", "OK");
-                map.put("images", imageService.upload(token, mpf));
-            } catch (IOException e) {
+                imageService.upload(token, mpf);
+            } catch (RollBackException e) {
                 map.put("status", "ERROR");
-                map.put("details", e.getMessage() + " IOException");
-
-            } catch (EmptyFieldException e) {
-                map.put("status", "ERROR");
-                map.put("details", e.getMessage() + " EmptyFieldException");
+                map.put("details", e.getMessage());
             }
         }
         return map;
