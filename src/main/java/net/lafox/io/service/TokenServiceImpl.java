@@ -42,4 +42,11 @@ public class TokenServiceImpl implements TokenService {
     public Token findByToken(String token) {
         return tokenDao.findByToken(token);
     }
+
+    @Override
+    public Token checkToken(String token) throws RollBackException{
+        Token t=tokenDao.findByToken(token);
+        if (t == null) throw new RollBackException("token not found");
+        return t;
+    }
 }

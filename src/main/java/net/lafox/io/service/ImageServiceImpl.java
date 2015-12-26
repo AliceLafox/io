@@ -30,20 +30,47 @@ public class ImageServiceImpl implements ImageService {
     @Autowired
     TokenService tokenService;
 
+    @Override
+    public void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException {
+        Image image = this.getImage(id, token);
+        image.setVersion(image.getVersion()+1);
+        image.setContentType(mpf.getContentType());
+        image.setFileName(mpf.getOriginalFilename());
+        image.setSize(mpf.getSize());
+        imageDao.save(image);
+
+        Token checkedToken = tokenService.checkToken(token);
+        try {
+            mpf.transferTo(new File(UPLOAD_DIR + "/" + checkedToken.getSiteName() + "/" + image.getId()));
+        } catch (IOException e) {
+            throw new RollBackException(e);
+        }
+    }
 
     @Override
     public List<Image> getImages(Token token) {
         return imageDao.findByTokenOrderBySortIndex(token);
     }
 
+    @Override
+    public Image getImage(Long id, String token) throws RollBackException {
+        if (token == null) throw new RollBackException("token is NULL for image id="+id);
+        if (token.isEmpty()) throw new RollBackException("toke is EMPTY for image id="+id);
+
+        Image image = imageDao.findOne(id);
+
+        if (image == null) throw new RollBackException("no image found with id="+id);
+        if (!token.equals(image.getToken().getToken())) throw new RollBackException("incorrect token: "+token +" for image id="+id);
+
+        return image;
+    }
 
     @Override
-    public Long upload(String token, MultipartFile mpf) throws RollBackException {
+    public Long addImage(String token, MultipartFile mpf) throws RollBackException {
 
-        Token checkedToken = tokenService.findByToken(token);
-        if (checkedToken == null) throw new RollBackException("token not found");
+        Token checkedToken = tokenService.checkToken(token);
 
-        Image image = new Image(checkedToken,mpf.getOriginalFilename(),mpf.getContentType(),mpf.getSize());
+        Image image = new Image(checkedToken,mpf.getContentType(),mpf.getOriginalFilename(),mpf.getSize());
         imageDao.save(image);
 
         try {

@@ -4,10 +4,7 @@ import net.lafox.io.exceptions.RollBackException;
 import net.lafox.io.service.ImageService;
 import net.lafox.io.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -34,13 +31,24 @@ public class ImageController {
 
 
 
-    @RequestMapping(value = "update/{id}", method = RequestMethod.POST)
-    public synchronized void update(MultipartHttpServletRequest request,
+    @RequestMapping(value = "update/{id:\\d+}", method = RequestMethod.POST)
+    public synchronized Map<String, Object> update(MultipartHttpServletRequest request,
                                                    HttpServletResponse response,
+                                                   @PathVariable Long id,
                                                    @RequestParam(defaultValue = "") String token,
                                                    @RequestParam(value = "data", required = false) List<MultipartFile> files
     ) {
-
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", "OK");
+        for (MultipartFile mpf : files) {
+            try {
+                imageService.updateImage(id,token, mpf);
+            } catch (RollBackException e) {
+                map.put("status", "ERROR");
+                map.put("details", e.getMessage());
+            }
+        }
+        return map;
     }
 
 
@@ -55,7 +63,7 @@ public class ImageController {
         map.put("status", "OK");
         for (MultipartFile mpf : files) {
             try {
-                imageService.upload(token, mpf);
+                imageService.addImage(token, mpf);
             } catch (RollBackException e) {
                 map.put("status", "ERROR");
                 map.put("details", e.getMessage());

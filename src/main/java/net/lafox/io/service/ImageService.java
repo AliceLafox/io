@@ -15,5 +15,10 @@ import java.util.List;
 
 public interface ImageService {
     List<Image> getImages(Token token);
-    Long upload(String token, MultipartFile mpf) throws RollBackException;
+
+    Image getImage(Long id, String token) throws RollBackException;
+
+    Long addImage(String token, MultipartFile mpf) throws RollBackException;
+    void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException;
+
 }

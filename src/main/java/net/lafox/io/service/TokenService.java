@@ -16,4 +16,5 @@ public interface TokenService {
 
     Token findByToken(String token);
 
+    Token checkToken(String token) throws RollBackException;
 }
