@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Alice Lafox <alice@lafox.net> on 23.12.15
@@ -24,6 +26,7 @@ import java.util.List;
 public class ImageServiceImpl implements ImageService {
     @Value("${upload.dir}")
     private String UPLOAD_DIR;
+
 
     @Autowired
     ImageDao imageDao;
@@ -95,4 +98,29 @@ public class ImageServiceImpl implements ImageService {
         image.setActive(false);
         imageDao.save(image);
     }
+
+    @Override
+    public void getImagesByRoToken(String roToken, Map<String, Object> map) throws RollBackException {
+
+        try {
+            map.put("images", new ArrayList<>());
+            map.put("imagesDeleted", new ArrayList<>());
+            map.put("avatar", null);
+
+            for (Image image : imageDao.getImagesByRoToken(roToken)) {
+                if (image.isActive()) {
+                    ((List) map.get("images")).add(image.asDto());
+                } else {
+                    ((List) map.get("imagesDeleted")).add(image.asDto());
+                }
+                if (image.isAvatar()) map.put("avatar", image.asDto());
+
+            }
+
+        } catch (Exception e) {
+            throw new RollBackException(e);
+        }
+
+    }
+
 }

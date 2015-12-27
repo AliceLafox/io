@@ -1,31 +1,17 @@
 package net.lafox.io.entity;
 
 
-import org.springframework.beans.BeanUtils;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.util.Date;
 
 /**
- * Created by Alice Lafox <alice@lafox.net> on 20.12.15
+ * Created by Alice Lafox <alice@lafox.net> on 27.12.15
  * Lafox.Net Software Developers Team http://dev.lafox.net
  */
 
-@Entity
-@Table(name = "image")
-public class Image implements Serializable {
 
-    private static final long serialVersionUID = 679756698908629665L;
-    @Id
-    @GeneratedValue
+public class ImageDto {
+
     private Long id;
-
-    @NotNull
-    @ManyToOne(optional = false)
-    private Token token;
-
     private int sortIndex;
     private int version;
     private int width;
@@ -38,64 +24,12 @@ public class Image implements Serializable {
     private String description;
     private Long size;
 
-    private boolean active;
-    private boolean avatar;
-
-    @PreUpdate
-    public void setLastUpdate() {
-        this.modified = new Date();
-    }
-
-    public Image(Token token) {
-        this.token = token;
-    }
-
-    public Image(Token token, String contentType, String fileName, Long size) {
-        this.token = token;
-        this.contentType = contentType;
-        this.fileName = fileName;
-        this.size = size;
-
-    }
-
-    public Image() {
-    }
-
-    public ImageDto asDto(){
-        ImageDto imageDto=new ImageDto();
-        BeanUtils.copyProperties(this, imageDto);
-        return imageDto;
-    }
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
-    public boolean isAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(boolean avatar) {
-        this.avatar = avatar;
-    }
-
     public Long getId() {
         return id;
     }
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Token getToken() {
-        return token;
-    }
-
-    public void setToken(Token token) {
-        this.token = token;
     }
 
     public int getSortIndex() {
@@ -185,5 +119,4 @@ public class Image implements Serializable {
     public void setSize(Long size) {
         this.size = size;
     }
-
 }

@@ -10,11 +10,11 @@ import net.lafox.io.exceptions.RollBackException;
  */
 
 public interface TokenService {
-    String addToken(String siteName, String ownerName, Long ownerId, String ip) throws RollBackException;
+    Token addToken(String siteName, String ownerName, Long ownerId, String ip) throws RollBackException;
 
     String findBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId);
 
-    Token findByRwToken(String token);
+    Token findByRwToken(String rwToken);
 
-    Token checkRwToken(String token) throws RollBackException;
+    Token checkRwToken(String rwToken) throws RollBackException;
 }

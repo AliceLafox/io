@@ -1,9 +1,6 @@
 package net.lafox.io.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -14,13 +11,15 @@ import java.util.UUID;
  */
 
 @Entity
-@Table(name = "token")
+@Table(name = "token",  uniqueConstraints = @UniqueConstraint(columnNames = {"siteName","ownerName","ownerId"}))
 public class Token implements Serializable {
     private static final long serialVersionUID = 495411682022208001L;
     @Id
     @GeneratedValue
     private Long id;
+    @Column(unique = true)
     private String rwToken;
+    @Column(unique = true)
     private String roToken;
     private String siteName;
     private String ownerName;
@@ -34,6 +33,7 @@ public class Token implements Serializable {
         this.ownerId = ownerId;
         this.ip = ip;
         this.rwToken = UUID.randomUUID().toString();
+        this.roToken = UUID.randomUUID().toString().substring(0,8);
     }
 
     public Token() {

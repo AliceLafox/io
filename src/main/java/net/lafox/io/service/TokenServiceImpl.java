@@ -20,7 +20,7 @@ public class TokenServiceImpl implements TokenService {
     TokenDao tokenDao;
 
     @Override
-    public String addToken(String siteName, String ownerName, Long ownerId, String ip) throws RollBackException {
+    public Token addToken(String siteName, String ownerName, Long ownerId, String ip) throws RollBackException {
 
         if (siteName==null || siteName.isEmpty()|| ownerName==null || ownerName.isEmpty() || ownerId==null || ownerId==0)
             throw new RollBackException("rejected: required parameters are empty");
@@ -30,7 +30,7 @@ public class TokenServiceImpl implements TokenService {
             token = new Token(siteName, ownerName, ownerId, ip);
             tokenDao.save(token);
         }
-        return token.getRwToken();
+        return token;
     }
 
     @Override

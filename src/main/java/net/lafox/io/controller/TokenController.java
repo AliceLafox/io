@@ -1,5 +1,6 @@
 package net.lafox.io.controller;
 
+import net.lafox.io.entity.Token;
 import net.lafox.io.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +31,9 @@ public class TokenController {
                       @RequestParam(defaultValue = "0") Long ownerId) {
         Map<String, Object> map = new HashMap<>();
         try {
-            map.put("token", tokenService.addToken(siteName, ownerName, ownerId, request.getRemoteAddr()));
+            Token token=tokenService.addToken(siteName, ownerName, ownerId, request.getRemoteAddr());
+            map.put("roToken", token.getRoToken());
+            map.put("rwToken", token.getRwToken());
             map.put("status", "OK");
 
         } catch (Exception e) {

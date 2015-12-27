@@ -81,6 +81,19 @@ public class ImageController {
         return map;
     }
 
+ @RequestMapping(value = "list/{roToken}", method = RequestMethod.GET)
+    public synchronized Map<String, Object> getImages(@PathVariable String roToken) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", "OK");
+            try {
+                imageService.getImagesByRoToken(roToken, map);
+            } catch (Exception e) {
+                map.put("status", "ERROR");
+                map.put("details", e.getMessage());
+            }
+        return map;
+    }
+
     @RequestMapping(value = "test")
     public Object test(HttpServletRequest request) {
         Map<String, Object> map = new HashMap<>();
