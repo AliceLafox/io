@@ -4,6 +4,8 @@ import net.lafox.io.IoApplication;
 import net.lafox.io.entity.Image;
 import net.lafox.io.service.ImageService;
 import net.lafox.io.service.TokenService;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +46,7 @@ public class ImageControllerTest {
     private String ownerName;
     private Long ownerId ;
     private String ip;
+    File workingDir;
 
     @Autowired
     TokenService tokenService;
@@ -55,11 +58,24 @@ public class ImageControllerTest {
     public void setUp() {
 
         mockMvc = webAppContextSetup(webApplicationContext).build();
-         siteName = "lafox.net";
+         siteName = "test-domain";
          ownerName = "item";
          ownerId = 102L;
          ip = "10.10.10.10";
+
+        workingDir=new File(UPLOAD_DIR+"/"+siteName);
+        if (!workingDir.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            workingDir.mkdir();
+        }
+
     }
+
+    @After
+    public void tearDown() throws Exception {
+        FileUtils.cleanDirectory(workingDir);
+    }
+
 
     @Test
     public void testImageResponse() throws Exception {
@@ -122,11 +138,11 @@ public class ImageControllerTest {
 
         Assert.assertEquals(img.getVersion()+1,imgNew.getVersion());
         Assert.assertTrue(img.getModified().compareTo(imgNew.getModified()) == -1);
-        Assert.assertEquals(file3.length(), 0+ imgNew.getSize());
+        Assert.assertEquals(file3.length(), imgNew.getSize().longValue());
         Assert.assertEquals(file3.getName(), imgNew.getFileName());
 
-        File fileOnDisk=new File(UPLOAD_DIR + "/" + tokenService.findByToken(token).getSiteName() + "/" + imgNew.getId());
-        Assert.assertEquals(fileOnDisk.length(), 0+imgNew.getSize());
+        File fileOnDisk=new File(imageService.imagePath(imgNew));
+        Assert.assertEquals(fileOnDisk.length(), imgNew.getSize().longValue());
 
     }
 

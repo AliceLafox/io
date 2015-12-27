@@ -14,6 +14,8 @@ import java.util.List;
  */
 
 public interface ImageService {
+    String imagePath(Image image);
+
     List<Image> getImages(Token token);
 
     Image getImage(Long id, String token) throws RollBackException;

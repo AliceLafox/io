@@ -32,6 +32,8 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException {
+        Token checkedToken = tokenService.checkToken(token);
+
         Image image = this.getImage(id, token);
         image.setVersion(image.getVersion()+1);
         image.setContentType(mpf.getContentType());
@@ -39,14 +41,18 @@ public class ImageServiceImpl implements ImageService {
         image.setSize(mpf.getSize());
         imageDao.save(image);
 
-        Token checkedToken = tokenService.checkToken(token);
         try {
-            mpf.transferTo(new File(UPLOAD_DIR + "/" + checkedToken.getSiteName() + "/" + image.getId()));
+            mpf.transferTo(new File(imagePath(image)));
         } catch (IOException e) {
             throw new RollBackException(e);
         }
     }
 
+    @Override
+    public String imagePath(Image image) {
+        String ver=image.getVersion()==0?"":"_"+image.getVersion();
+        return UPLOAD_DIR + "/" + image.getToken().getSiteName() + "/" + image.getId() + ver + ".jpg";
+    }
     @Override
     public List<Image> getImages(Token token) {
         return imageDao.findByTokenOrderBySortIndex(token);
@@ -74,7 +80,7 @@ public class ImageServiceImpl implements ImageService {
         imageDao.save(image);
 
         try {
-            mpf.transferTo(new File(UPLOAD_DIR + "/" + checkedToken.getSiteName() + "/" + image.getId()));
+            mpf.transferTo(new File(imagePath(image)));
         } catch (IOException e) {
             throw new RollBackException(e);
         }

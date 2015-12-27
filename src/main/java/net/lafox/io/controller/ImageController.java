@@ -6,10 +6,8 @@ import net.lafox.io.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +30,13 @@ public class ImageController {
 
 
     @RequestMapping(value = "update/{id:\\d+}", method = RequestMethod.POST)
-    public synchronized Map<String, Object> update(MultipartHttpServletRequest request,
-                                                   HttpServletResponse response,
-                                                   @PathVariable Long id,
+    public synchronized Map<String, Object> update(@PathVariable Long id,
                                                    @RequestParam(defaultValue = "") String token,
-                                                   @RequestParam(value = "data", required = false) List<MultipartFile> files
+                                                   @RequestParam(defaultValue = "") List<MultipartFile> data
     ) {
         Map<String, Object> map = new HashMap<>();
         map.put("status", "OK");
-        for (MultipartFile mpf : files) {
+        for (MultipartFile mpf : data) {
             try {
                 imageService.updateImage(id,token, mpf);
             } catch (RollBackException e) {
@@ -54,14 +50,12 @@ public class ImageController {
 
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
-    public synchronized Map<String, Object> upload(MultipartHttpServletRequest request,
-                                                   HttpServletResponse response,
-                                                   @RequestParam(defaultValue = "") String token,
-                                                   @RequestParam(value = "data", required = false) List<MultipartFile> files
+    public synchronized Map<String, Object> upload(@RequestParam(defaultValue = "") String token,
+                                                   @RequestParam(defaultValue = "") List<MultipartFile> data
     ) {
         Map<String, Object> map = new HashMap<>();
         map.put("status", "OK");
-        for (MultipartFile mpf : files) {
+        for (MultipartFile mpf : data) {
             try {
                 imageService.addImage(token, mpf);
             } catch (RollBackException e) {
