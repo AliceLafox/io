@@ -32,7 +32,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException {
-        Token checkedToken = tokenService.checkToken(token);
+        tokenService.checkRwToken(token);
 
         Image image = this.getImage(id, token);
         image.setVersion(image.getVersion()+1);
@@ -53,6 +53,7 @@ public class ImageServiceImpl implements ImageService {
         String ver=image.getVersion()==0?"":"_"+image.getVersion();
         return UPLOAD_DIR + "/" + image.getToken().getSiteName() + "/" + image.getId() + ver + ".jpg";
     }
+
     @Override
     public List<Image> getImages(Token token) {
         return imageDao.findByTokenOrderBySortIndex(token);
@@ -66,7 +67,7 @@ public class ImageServiceImpl implements ImageService {
         Image image = imageDao.findOne(id);
 
         if (image == null) throw new RollBackException("no image found with id="+id);
-        if (!token.equals(image.getToken().getToken())) throw new RollBackException("incorrect token: "+token +" for image id="+id);
+        if (!token.equals(image.getToken().getRwToken())) throw new RollBackException("incorrect token: "+token +" for image id="+id);
 
         return image;
     }
@@ -74,7 +75,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Long addImage(String token, MultipartFile mpf) throws RollBackException {
 
-        Token checkedToken = tokenService.checkToken(token);
+        Token checkedToken = tokenService.checkRwToken(token);
 
         Image image = new Image(checkedToken,mpf.getContentType(),mpf.getOriginalFilename(),mpf.getSize());
         image.setActive(true);
@@ -89,7 +90,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void deleteImage (Long id, String token) throws RollBackException {
+    public void deleteImage(Long id, String token) throws RollBackException {
         Image image=getImage(id, token);
         image.setActive(false);
         imageDao.save(image);

@@ -30,22 +30,22 @@ public class TokenServiceImpl implements TokenService {
             token = new Token(siteName, ownerName, ownerId, ip);
             tokenDao.save(token);
         }
-        return token.getToken();
+        return token.getRwToken();
     }
 
     @Override
     public String findBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId) {
-        return tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId).getToken();
+        return tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId).getRwToken();
     }
 
     @Override
-    public Token findByToken(String token) {
-        return tokenDao.findByToken(token);
+    public Token findByRwToken(String token) {
+        return tokenDao.findByRwToken(token);
     }
 
     @Override
-    public Token checkToken(String token) throws RollBackException{
-        Token t=tokenDao.findByToken(token);
+    public Token checkRwToken(String token) throws RollBackException{
+        Token t=tokenDao.findByRwToken(token);
         if (t == null) throw new RollBackException("token not found");
         return t;
     }

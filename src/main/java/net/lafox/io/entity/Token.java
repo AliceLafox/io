@@ -20,7 +20,8 @@ public class Token implements Serializable {
     @Id
     @GeneratedValue
     private Long id;
-    private String token;
+    private String rwToken;
+    private String roToken;
     private String siteName;
     private String ownerName;
     private Long ownerId;
@@ -32,18 +33,26 @@ public class Token implements Serializable {
         this.ownerName = ownerName;
         this.ownerId = ownerId;
         this.ip = ip;
-        this.token = UUID.randomUUID().toString();
+        this.rwToken = UUID.randomUUID().toString();
     }
 
     public Token() {
     }
 
-    public String getToken() {
-        return token;
+    public String getRoToken() {
+        return roToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setRoToken(String roToken) {
+        this.roToken = roToken;
+    }
+
+    public String getRwToken() {
+        return rwToken;
+    }
+
+    public void setRwToken(String rwToken) {
+        this.rwToken = rwToken;
     }
 
     public String getSiteName() {

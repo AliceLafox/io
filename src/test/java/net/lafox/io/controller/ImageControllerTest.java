@@ -101,7 +101,7 @@ public class ImageControllerTest {
         String token = tokenService.addToken(siteName, ownerName, ownerId, ip);
         upload2Files(token);
 
-        Image img=imageService.getImages(tokenService.findByToken(token)).get(1);
+        Image img=imageService.getImages(tokenService.findByRwToken(token)).get(1);
 
         File file3=new File(UPLOAD_DIR + "/testImage3.jpg");
         MockMultipartFile image3 = new MockMultipartFile("data", "testImage3.jpg", "image/jpg", new FileInputStream(file3));
@@ -145,10 +145,10 @@ public class ImageControllerTest {
     public void testImageDelete() throws Exception {
         String token = tokenService.addToken(siteName, ownerName, ownerId, ip);
         upload2Files(token);
-        Image img=imageService.getImages(tokenService.findByToken(token)).get(1);
+        Image img=imageService.getImages(tokenService.findByRwToken(token)).get(1);
 
         mockMvc.perform(delete("/image/delete/" + img.getId())
-                .param("token", img.getToken().getToken()))
+                .param("token", img.getToken().getRwToken()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.status").value("OK"))

@@ -14,7 +14,7 @@ public interface TokenService {
 
     String findBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId);
 
-    Token findByToken(String token);
+    Token findByRwToken(String token);
 
-    Token checkToken(String token) throws RollBackException;
+    Token checkRwToken(String token) throws RollBackException;
 }
