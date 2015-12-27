@@ -26,6 +26,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.File;
 import java.io.FileInputStream;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -92,33 +93,13 @@ public class ImageControllerTest {
 
         String token = tokenService.addToken(siteName, ownerName, ownerId, ip);
 
-        MockMultipartFile image1 = new MockMultipartFile("data", "testImage1.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage1.jpg"));
-        MockMultipartFile image2 = new MockMultipartFile("data", "testImage2.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage2.jpg"));
-
-        mockMvc.perform(MockMvcRequestBuilders.fileUpload("/image/upload")
-                .file(image1)
-                .file(image2)
-                .param("token", token))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(jsonPath("$.status").value("OK"))
-        ;
+        upload2Files(token);
     }
     @Test
     public void testImageUpdate() throws Exception {
 
         String token = tokenService.addToken(siteName, ownerName, ownerId, ip);
-        MockMultipartFile image1 = new MockMultipartFile("data", "testImage1.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage1.jpg"));
-        MockMultipartFile image2 = new MockMultipartFile("data", "testImage2.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage2.jpg"));
-
-        mockMvc.perform(MockMvcRequestBuilders.fileUpload("/image/upload")
-                .file(image1)
-                .file(image2)
-                .param("token", token))
-                .andExpect(status().isOk())
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(jsonPath("$.status").value("OK"))
-        ;
+        upload2Files(token);
 
         Image img=imageService.getImages(tokenService.findByToken(token)).get(1);
 
@@ -146,5 +127,36 @@ public class ImageControllerTest {
 
     }
 
+    private void upload2Files(String token) throws Exception {
+        MockMultipartFile image1 = new MockMultipartFile("data", "testImage1.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage1.jpg"));
+        MockMultipartFile image2 = new MockMultipartFile("data", "testImage2.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage2.jpg"));
 
+        mockMvc.perform(MockMvcRequestBuilders.fileUpload("/image/upload")
+                .file(image1)
+                .file(image2)
+                .param("token", token))
+                .andExpect(status().isOk())
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(jsonPath("$.status").value("OK"))
+        ;
+    }
+
+    @Test
+    public void testImageDelete() throws Exception {
+        String token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        upload2Files(token);
+        Image img=imageService.getImages(tokenService.findByToken(token)).get(1);
+
+        mockMvc.perform(delete("/image/delete/" + img.getId())
+                .param("token", img.getToken().getToken()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.status").value("OK"))
+        ;
+
+        Image imgNew=imageService.getImage(img.getId(),token);
+
+        Assert.assertTrue(img.isActive());
+        Assert.assertFalse(imgNew.isActive());
+    }
 }

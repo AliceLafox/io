@@ -77,6 +77,7 @@ public class ImageServiceImpl implements ImageService {
         Token checkedToken = tokenService.checkToken(token);
 
         Image image = new Image(checkedToken,mpf.getContentType(),mpf.getOriginalFilename(),mpf.getSize());
+        image.setActive(true);
         imageDao.save(image);
 
         try {
@@ -85,5 +86,12 @@ public class ImageServiceImpl implements ImageService {
             throw new RollBackException(e);
         }
         return image.getId();
+    }
+
+    @Override
+    public void deleteImage (Long id, String token) throws RollBackException {
+        Image image=getImage(id, token);
+        image.setActive(false);
+        imageDao.save(image);
     }
 }

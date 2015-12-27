@@ -35,6 +35,9 @@ public class Image implements Serializable {
     private String description;
     private Long size;
 
+    private boolean active;
+    private boolean avatar;
+
     @PreUpdate
     public void setLastUpdate() {
         this.modified = new Date();
@@ -49,11 +52,27 @@ public class Image implements Serializable {
         this.contentType = contentType;
         this.fileName = fileName;
         this.size = size;
+
     }
 
     public Image() {
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public boolean isAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(boolean avatar) {
+        this.avatar = avatar;
+    }
 
     public Long getId() {
         return id;

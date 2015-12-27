@@ -47,6 +47,21 @@ public class ImageController {
         return map;
     }
 
+    @RequestMapping(value = "delete/{id:\\d+}", method = RequestMethod.DELETE)
+    public synchronized Map<String, Object> update(@PathVariable Long id,
+                                                   @RequestParam(defaultValue = "") String token
+
+    ) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", "OK");
+            try {
+                imageService.deleteImage(id,token);
+            } catch (RollBackException e) {
+                map.put("status", "ERROR");
+                map.put("details", e.getMessage());
+            }
+        return map;
+    }
 
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
