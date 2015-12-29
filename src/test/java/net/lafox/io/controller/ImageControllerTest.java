@@ -208,5 +208,6 @@ public class ImageControllerTest {
         Assert.assertFalse(img.isAvatar());
         Assert.assertTrue(imgNew.isAvatar());
 
+
     }
 }

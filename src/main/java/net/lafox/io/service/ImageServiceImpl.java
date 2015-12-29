@@ -101,16 +101,17 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void setAvatar(Long id, String rwToken) throws RollBackException {
-        Token token = tokenService.checkRwToken(rwToken);
 
+        if (id==null) throw new RollBackException("id can not be null");
+        Token token = tokenService.checkRwToken(rwToken);
         for (Image image : this.getImages(token)) {
             if (!image.isAvatar()) {
-                if(id.compareTo(image.getId())==0) {
+                if (id.equals(image.getId())) {
                     image.setAvatar(true);
                     imageDao.save(image);
                 }
             } else{
-                if(id.compareTo(image.getId())!=0) {
+                if (!id.equals(image.getId())) {
                     image.setAvatar(false);
                     imageDao.save(image);
                 }
