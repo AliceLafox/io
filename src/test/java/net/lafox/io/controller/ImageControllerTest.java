@@ -27,8 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.io.File;
 import java.io.FileInputStream;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -122,9 +121,9 @@ public class ImageControllerTest {
     public void testImageUpload() throws Exception {
 
         Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
-
         upload2Files(token.getRwToken());
     }
+
     @Test
     public void testImageUpdate() throws Exception {
 
@@ -188,5 +187,26 @@ public class ImageControllerTest {
 
         Assert.assertTrue(img.isActive());
         Assert.assertFalse(imgNew.isActive());
+    }
+
+
+    @Test
+    public void testSetAvatarImage() throws Exception {
+        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        upload2Files(token.getRwToken());
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+
+        mockMvc.perform(post("/image/avatar/" + img.getId())
+                .param("token", img.getToken().getRwToken()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.status").value("OK"))
+        ;
+
+        Image imgNew=imageService.getImage(img.getId(),token.getRwToken());
+
+        Assert.assertFalse(img.isAvatar());
+        Assert.assertTrue(imgNew.isAvatar());
+
     }
 }

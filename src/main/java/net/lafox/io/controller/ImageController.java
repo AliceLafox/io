@@ -63,6 +63,22 @@ public class ImageController {
         return map;
     }
 
+    @RequestMapping(value = "avatar/{id:\\d+}", method = RequestMethod.POST)
+    public synchronized Map<String, Object> avatar(@PathVariable Long id,
+                                                   @RequestParam(defaultValue = "") String token
+
+    ) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", "OK");
+            try {
+                imageService.setAvatar(id,token);
+            } catch (RollBackException e) {
+                map.put("status", "ERROR");
+                map.put("details", e.getMessage());
+            }
+        return map;
+    }
+
 
     @RequestMapping(value = "upload", method = RequestMethod.POST)
     public synchronized Map<String, Object> upload(@RequestParam(defaultValue = "") String token,

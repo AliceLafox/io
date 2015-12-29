@@ -20,5 +20,5 @@ public interface ImageDao extends JpaRepository<Image, Long> {
     List<Image> getImagesByRoToken(@Param(value = "roToken") String roToken);
 
 
-//    Image findByTokenAndIsAvatarIsTrue(Token token); //TODo
+
 }

@@ -23,9 +23,12 @@ public interface ImageService {
     Image getImage(Long id, String token) throws RollBackException;
 
     Long addImage(String token, MultipartFile mpf) throws RollBackException;
+
     void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException;
 
     void deleteImage(Long id, String token) throws RollBackException;
+
+    void setAvatar(Long id, String token) throws RollBackException;
 
     void getImagesByRoToken(String roToken,Map<String, Object> map) throws RollBackException;
 

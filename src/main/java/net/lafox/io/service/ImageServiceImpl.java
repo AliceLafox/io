@@ -65,7 +65,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Image getImage(Long id, String token) throws RollBackException {
         if (token == null) throw new RollBackException("token is NULL for image id="+id);
-        if (token.isEmpty()) throw new RollBackException("toke is EMPTY for image id="+id);
+        if (token.isEmpty()) throw new RollBackException("token is EMPTY for image id="+id);
 
         Image image = imageDao.findOne(id);
 
@@ -97,6 +97,25 @@ public class ImageServiceImpl implements ImageService {
         Image image=getImage(id, token);
         image.setActive(false);
         imageDao.save(image);
+    }
+
+    @Override
+    public void setAvatar(Long id, String rwToken) throws RollBackException {
+        Token token = tokenService.checkRwToken(rwToken);
+
+        for (Image image : this.getImages(token)) {
+            if (!image.isAvatar()) {
+                if(id.compareTo(image.getId())==0) {
+                    image.setAvatar(true);
+                    imageDao.save(image);
+                }
+            } else{
+                if(id.compareTo(image.getId())!=0) {
+                    image.setAvatar(false);
+                    imageDao.save(image);
+                }
+            }
+        }
     }
 
     @Override
