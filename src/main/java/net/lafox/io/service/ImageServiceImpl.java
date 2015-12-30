@@ -4,12 +4,14 @@ import net.lafox.io.dao.ImageDao;
 import net.lafox.io.entity.Image;
 import net.lafox.io.entity.Token;
 import net.lafox.io.exceptions.RollBackException;
+import net.lafox.io.utils.ImgUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -81,11 +83,20 @@ public class ImageServiceImpl implements ImageService {
         Token checkedToken = tokenService.checkRwToken(token);
 
         Image image = new Image(checkedToken,mpf.getContentType(),mpf.getOriginalFilename(),mpf.getSize());
-        image.setActive(true);
-        imageDao.save(image);
+        String filename = imagePath(image);
 
         try {
-            mpf.transferTo(new File(imagePath(image)));
+            mpf.transferTo(new File(filename));
+
+            Dimension dim = ImgUtils.imgDimension(mpf.getBytes());
+
+            image.setWidth(dim.width);
+            image.setHeight(dim.height);
+            image.setContentType(ImgUtils.getContentType(filename));
+
+            image.setActive(true);
+            imageDao.save(image);
+
         } catch (IOException e) {
             throw new RollBackException(e);
         }
