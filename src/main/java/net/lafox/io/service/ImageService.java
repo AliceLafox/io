@@ -32,4 +32,7 @@ public interface ImageService {
 
     void getImagesByRoToken(String roToken,Map<String, Object> map) throws RollBackException;
 
+    void setTitle(Long id, String token, String title) throws RollBackException;
+
+    void setDescription(Long id, String rwToken, String description) throws RollBackException;
 }

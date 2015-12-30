@@ -143,4 +143,26 @@ public class ImageServiceImpl implements ImageService {
 
     }
 
+    @Override
+    public void setTitle(Long id, String rwToken, String title) throws RollBackException {
+        if (title == null || title.isEmpty()) return;
+        if (id == null) throw new RollBackException("id can not be null");
+        tokenService.checkRwToken(rwToken);
+
+        Image image = getImage(id, rwToken);
+        image.setTitle(title);
+        imageDao.save(image);
+    }
+
+    @Override
+    public void setDescription(Long id, String rwToken, String description) throws RollBackException {
+        if (description == null || description.isEmpty()) return;
+        if (id == null) throw new RollBackException("id can not be null");
+        tokenService.checkRwToken(rwToken);
+
+        Image image = getImage(id, rwToken);
+        image.setDescription(description);
+        imageDao.save(image);
+    }
+
 }

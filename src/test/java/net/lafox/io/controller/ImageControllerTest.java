@@ -210,4 +210,52 @@ public class ImageControllerTest {
 
 
     }
+
+    @Test
+    public void testSetTitle() throws Exception {
+        String title="this is the title of image";
+        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        upload2Files(token.getRwToken());
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+
+        mockMvc.perform(post("/image/title/" + img.getId())
+                .param("token", img.getToken().getRwToken())
+                .param("title", title)
+        )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.status").value("OK"))
+        ;
+
+        Image imgNew=imageService.getImage(img.getId(),token.getRwToken());
+
+        Assert.assertNull(img.getTitle());
+        Assert.assertTrue(imgNew.getTitle().equals(title));
+
+
+    }
+
+    @Test
+    public void testSetDescription() throws Exception {
+        String description="this is the description of image";
+        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        upload2Files(token.getRwToken());
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+
+        mockMvc.perform(post("/image/description/" + img.getId())
+                .param("token", img.getToken().getRwToken())
+                .param("description", description)
+        )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.status").value("OK"))
+        ;
+
+        Image imgNew=imageService.getImage(img.getId(),token.getRwToken());
+
+        Assert.assertNull(img.getDescription());
+        Assert.assertTrue(imgNew.getDescription().equals(description));
+
+
+    }
 }
