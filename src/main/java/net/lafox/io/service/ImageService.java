@@ -22,6 +22,8 @@ public interface ImageService {
 
     Image getImage(Long id, String token) throws RollBackException;
 
+    Image getImage(Long id);
+
     Long addImage(String token, MultipartFile mpf) throws RollBackException;
 
     void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException;

@@ -32,7 +32,7 @@ public class Image implements Serializable {
     private int height;
     private Date created = new Date();
     private Date modified = new Date();
-    private String contentType;
+    private String contentType = "image/png";
     private String fileName;
     private String title;
     private String description;
@@ -57,6 +57,7 @@ public class Image implements Serializable {
         this.size = size;
 
     }
+
 
     public Image() {
     }

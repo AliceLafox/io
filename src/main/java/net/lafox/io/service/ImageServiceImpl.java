@@ -39,15 +39,21 @@ public class ImageServiceImpl implements ImageService {
     public void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException {
         tokenService.checkRwToken(token);
 
-        Image image = this.getImage(id, token);
-        image.setVersion(image.getVersion()+1);
-        image.setContentType(mpf.getContentType());
-        image.setFileName(mpf.getOriginalFilename());
-        image.setSize(mpf.getSize());
-        imageDao.save(image);
-
         try {
+            Image image = this.getImage(id, token);
+            image.setVersion(image.getVersion() + 1);
+            image.setContentType(contentType(mpf));
+            image.setFileName(mpf.getOriginalFilename());
+            image.setSize(mpf.getSize());
+
+            Dimension dim = ImgUtils.imgDimension(mpf.getBytes());
+            image.setWidth(dim.width);
+            image.setHeight(dim.height);
+
+            image.setActive(true);
+            imageDao.save(image);
             mpf.transferTo(new File(imagePath(image)));
+
         } catch (IOException e) {
             throw new RollBackException(e);
         }
@@ -55,7 +61,10 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String imagePath(Image image) {
-        String ver=image.getVersion()==0?"":"_"+image.getVersion();
+        if (image == null || image.getId() == null) return UPLOAD_DIR + "/404.png";
+
+//        String ver=image.getVersion()==0?"":"_"+image.getVersion();
+        String ver = "_" + image.getVersion();
         return UPLOAD_DIR + "/" + image.getToken().getSiteName() + "/" + image.getId() + ver + ".jpg";
     }
 
@@ -65,42 +74,46 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Image getImage(Long id, String token) throws RollBackException {
-        if (token == null) throw new RollBackException("token is NULL for image id="+id);
-        if (token.isEmpty()) throw new RollBackException("token is EMPTY for image id="+id);
+    public Image getImage(Long id, String rwToken) throws RollBackException {
+        if (rwToken == null) throw new RollBackException("token is NULL for image id=" + id);
+        if (rwToken.isEmpty()) throw new RollBackException("token is EMPTY for image id=" + id);
 
         Image image = imageDao.findOne(id);
 
         if (image == null) throw new RollBackException("no image found with id="+id);
-        if (!token.equals(image.getToken().getRwToken())) throw new RollBackException("incorrect token: "+token +" for image id="+id);
+        if (!rwToken.equals(image.getToken().getRwToken())) throw new RollBackException("incorrect token: " + rwToken + " for image id=" + id);
 
         return image;
+    }
+
+    @Override
+    public Image getImage(Long id) {
+        if (id == null || id < 1) return null;
+        return imageDao.findOne(id);
+    }
+
+    private String contentType(MultipartFile mpf){
+
+        return "image/jpg".equals(mpf.getContentType())?"image/jpeg": mpf.getContentType();
     }
 
     @Override
     public Long addImage(String token, MultipartFile mpf) throws RollBackException {
 
         Token checkedToken = tokenService.checkRwToken(token);
-
-        Image image = new Image(checkedToken,mpf.getContentType(),mpf.getOriginalFilename(),mpf.getSize());
-        String filename = imagePath(image);
-
         try {
-            mpf.transferTo(new File(filename));
-
+            Image image = new Image(checkedToken,contentType(mpf), mpf.getOriginalFilename(), mpf.getSize());
             Dimension dim = ImgUtils.imgDimension(mpf.getBytes());
-
             image.setWidth(dim.width);
             image.setHeight(dim.height);
-            image.setContentType(ImgUtils.getContentType(filename));
-
             image.setActive(true);
             imageDao.save(image);
+            mpf.transferTo(new File(imagePath(image)));
+            return image.getId();
 
         } catch (IOException e) {
             throw new RollBackException(e);
         }
-        return image.getId();
     }
 
     @Override

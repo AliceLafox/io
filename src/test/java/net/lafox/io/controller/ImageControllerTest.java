@@ -5,6 +5,7 @@ import net.lafox.io.entity.Image;
 import net.lafox.io.entity.Token;
 import net.lafox.io.service.ImageService;
 import net.lafox.io.service.TokenService;
+import net.lafox.io.utils.ImgUtils;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
@@ -20,12 +21,15 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.Files;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -45,9 +49,10 @@ public class ImageControllerTest {
     private MockMvc mockMvc;
     private String siteName ;
     private String ownerName;
-    private Long ownerId ;
+    private static Long ownerId = null;
     private String ip;
     File workingDir;
+
 
     @Autowired
     TokenService tokenService;
@@ -61,7 +66,7 @@ public class ImageControllerTest {
         mockMvc = webAppContextSetup(webApplicationContext).build();
          siteName = "test-domain";
          ownerName = "item";
-         ownerId = 102L;
+        ownerId = (ownerId == null) ? 102L : ownerId++;
          ip = "10.10.10.10";
 
         workingDir=new File(UPLOAD_DIR+"/"+siteName);
@@ -79,6 +84,34 @@ public class ImageControllerTest {
 
 
     @Test
+    public void testGetOneImageBody() throws Exception {
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
+        upload2Files(token.getRwToken());
+        Image img = imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+
+//        "{id:\\d+}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d}.{ext:png|jpg|gif}"
+
+        mockMvc.perform(get("/" + img.getId() + "-w100-h100-oo-q50-v222.png"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
+                .andExpect(content().bytes(Files.readAllBytes(new File(imageService.imagePath(img)).toPath())))
+        ;
+
+        int w = 100;
+        int h = 120;
+        MvcResult result = mockMvc.perform(get("/" + img.getId() + "-w" + w + "-h" + h + "-oc-q50-v222.png"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.IMAGE_PNG_VALUE))
+                .andReturn();
+
+        Dimension dim = ImgUtils.imgDimension(result.getResponse().getContentAsByteArray());
+
+        Assert.assertEquals(dim.getWidth(), w, 0.1);
+        Assert.assertEquals(dim.getHeight(), h, 0.1);
+
+    }
+
+    @Test
     public void testImageResponse() throws Exception {
         mockMvc.perform(get("/image/test"))
                 .andExpect(status().isOk())
@@ -90,7 +123,7 @@ public class ImageControllerTest {
 
     @Test
     public void testGetImages() throws Exception {
-        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getRwToken());
 
         mockMvc.perform(get("/image/list/" + token.getRoToken()))
@@ -120,14 +153,15 @@ public class ImageControllerTest {
     @Test
     public void testImageUpload() throws Exception {
 
-        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getRwToken());
+
     }
 
     @Test
     public void testImageUpdate() throws Exception {
 
-        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getRwToken());
 
         Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
@@ -156,23 +190,28 @@ public class ImageControllerTest {
 
     }
 
-    private void upload2Files(String token) throws Exception {
+    private void upload2Files(String rwToken) throws Exception {
         MockMultipartFile image1 = new MockMultipartFile("data", "testImage1.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage1.jpg"));
         MockMultipartFile image2 = new MockMultipartFile("data", "testImage2.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage2.jpg"));
 
         mockMvc.perform(MockMvcRequestBuilders.fileUpload("/image/upload")
                 .file(image1)
                 .file(image2)
-                .param("token", token))
+                .param("token", rwToken))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
+
+        for (Image img : imageService.getImages(tokenService.findByRwToken(rwToken))) {
+            File fileOnDisk = new File(imageService.imagePath(img));
+            Assert.assertEquals(img.getSize().longValue(), fileOnDisk.length());
+        }
     }
 
     @Test
     public void testImageDelete() throws Exception {
-        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getRwToken());
         Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
 
@@ -192,7 +231,7 @@ public class ImageControllerTest {
 
     @Test
     public void testSetAvatarImage() throws Exception {
-        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getRwToken());
         Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
 
@@ -214,7 +253,7 @@ public class ImageControllerTest {
     @Test
     public void testSetTitle() throws Exception {
         String title="this is the title of image";
-        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getRwToken());
         Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
 
@@ -238,7 +277,7 @@ public class ImageControllerTest {
     @Test
     public void testSetDescription() throws Exception {
         String description="this is the description of image";
-        Token token = tokenService.addToken(siteName, ownerName, ownerId, ip);
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getRwToken());
         Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
 
