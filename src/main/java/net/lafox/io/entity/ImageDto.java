@@ -13,7 +13,7 @@ public class ImageDto {
 
     private Long id;
     private int sortIndex;
-    private int version;
+    private int v; //version
     private int width;
     private int height;
     private Date created = new Date();
@@ -40,12 +40,12 @@ public class ImageDto {
         this.sortIndex = sortIndex;
     }
 
-    public int getVersion() {
-        return version;
+    public int getV() {
+        return v;
     }
 
-    public void setVersion(int version) {
-        this.version = version;
+    public void setV(int v) {
+        this.v = v;
     }
 
     public int getWidth() {

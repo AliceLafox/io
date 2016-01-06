@@ -65,6 +65,7 @@ public class Image implements Serializable {
     public ImageDto asDto(){
         ImageDto imageDto=new ImageDto();
         BeanUtils.copyProperties(this, imageDto);
+        imageDto.setV(version);
         return imageDto;
     }
     public boolean isActive() {

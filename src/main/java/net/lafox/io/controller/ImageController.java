@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("image")
+@CrossOrigin(origins = "*")
 public class ImageController {
 
     @Autowired
@@ -119,6 +120,11 @@ public class ImageController {
                                                    @RequestParam(defaultValue = "") List<MultipartFile> data
     ) {
         Map<String, Object> map = new HashMap<>();
+        if (data.size() == 0) {
+            map.put("status", "ERROR");
+            map.put("details", "file list (data) is empty");
+            return map;
+        }
         map.put("status", "OK");
         for (MultipartFile mpf : data) {
             try {

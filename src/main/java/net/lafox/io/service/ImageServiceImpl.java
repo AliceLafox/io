@@ -63,7 +63,7 @@ public class ImageServiceImpl implements ImageService {
     public String imagePath(Image image) {
         if (image == null || image.getId() == null) return UPLOAD_DIR + "/404.png";
 
-//        String ver=image.getVersion()==0?"":"_"+image.getVersion();
+//        String ver=image.getV()==0?"":"_"+image.getV();
         String ver = "_" + image.getVersion();
         return UPLOAD_DIR + "/" + image.getToken().getSiteName() + "/" + image.getId() + ver + ".jpg";
     }
