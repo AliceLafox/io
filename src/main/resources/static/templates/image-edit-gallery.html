@@ -1,0 +1,14 @@
+
+<div class="row" >
+    <div class="col-xs-6 col-md-1" ng-repeat="image in images">
+        <div class="thumbnail" aria-haspopup="true" aria-expanded="false">
+            <thumbnail image="image"></thumbnail>
+            <div class="caption">
+                <h3>#{{image.id}}: {{image.title}} </h3>
+                <!--<input type="text" ng-model="{{description}}" value="{{image.description}}"/>-->
+               <button type="submit" class="btn btn-primary" ng-click="deleteImage(image.id, 'rw-token')">Delete</button>
+            </div>
+        </div>
+    </div>
+
+</div>

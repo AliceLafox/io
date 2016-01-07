@@ -1,0 +1,25 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+
+<form name="uploadFilesForm" novalidate enctype="multipart/form-data"
+      ng-submit="uploadFilesForm.$valid && submit('rw-token') ">
+    <div class="btn btn-primary" ngf-select ng-model="files" ngf-multiple="true"
+         ngf-pattern="'image/*'" ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100">Select Images
+    </div>
+    <button type="submit" class="btn">Upload</button>
+    <button type="submit" class="btn" ng-click="loadImages('ro-token')">Refresh</button>
+</form>
+
+
+    </div>
+</div>
+
+<!--<hr>-->
+<!--<h1>NON AJAX Form (for testing)</h1>-->
+<!--<form method="post" action="http://localhost:8081/image/upload" enctype="multipart/form-data">-->
+
+    <!--<input type="text" name="token" value="rw-token"/>-->
+    <!--<input type="file" name="data" multiple="true"/>-->
+    <!--<input type="submit"/>-->
+<!--</form>-->
+
