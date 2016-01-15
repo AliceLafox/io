@@ -28,14 +28,14 @@ public class TokenServiceImpl implements TokenService {
         Token token = tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId);
         if (token == null) {
             token = new Token(siteName, ownerName, ownerId, ip);
-            tokenDao.save(token);
+            tokenDao.insert(token);
         }
         return token;
     }
 
     @Override
-    public String findBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId) {
-        return tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId).getRwToken();
+    public String findWriteTokenBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId) {
+        return tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId).getWriteToken();
     }
 
     @Override

@@ -32,8 +32,8 @@ public class TokenController {
         Map<String, Object> map = new HashMap<>();
         try {
             Token token=tokenService.addToken(siteName, ownerName, ownerId, request.getRemoteAddr());
-            map.put("roToken", token.getRoToken());
-            map.put("rwToken", token.getRwToken());
+            map.put("readToken", token.getReadToken());
+            map.put("writeToken", token.getWriteToken());
             map.put("status", "OK");
 
         } catch (Exception e) {

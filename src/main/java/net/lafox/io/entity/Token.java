@@ -1,6 +1,5 @@
 package net.lafox.io.entity;
 
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
@@ -10,17 +9,11 @@ import java.util.UUID;
  * Lafox.Net Software Developers Team http://dev.lafox.net
  */
 
-@Entity
-@Table(name = "token",  uniqueConstraints = @UniqueConstraint(columnNames = {"siteName","ownerName","ownerId"}))
 public class Token implements Serializable {
     private static final long serialVersionUID = 495411682022208001L;
-    @Id
-    @GeneratedValue
     private Long id;
-    @Column(unique = true)
-    private String rwToken;
-    @Column(unique = true)
-    private String roToken;
+    private String readToken;
+    private String writeToken;
     private String siteName;
     private String ownerName;
     private Long ownerId;
@@ -32,27 +25,27 @@ public class Token implements Serializable {
         this.ownerName = ownerName;
         this.ownerId = ownerId;
         this.ip = ip;
-        this.rwToken = UUID.randomUUID().toString();
-        this.roToken = UUID.randomUUID().toString().substring(0,8);
+        this.writeToken = UUID.randomUUID().toString();
+        this.readToken = UUID.randomUUID().toString().substring(0,8);
     }
 
     public Token() {
     }
 
-    public String getRoToken() {
-        return roToken;
+    public String getReadToken() {
+        return readToken;
     }
 
-    public void setRoToken(String roToken) {
-        this.roToken = roToken;
+    public void setReadToken(String readToken) {
+        this.readToken = readToken;
     }
 
-    public String getRwToken() {
-        return rwToken;
+    public String getWriteToken() {
+        return writeToken;
     }
 
-    public void setRwToken(String rwToken) {
-        this.rwToken = rwToken;
+    public void setWriteToken(String writeToken) {
+        this.writeToken = writeToken;
     }
 
     public String getSiteName() {

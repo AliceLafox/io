@@ -81,7 +81,7 @@ public class ImageServiceImpl implements ImageService {
         Image image = imageDao.findOne(id);
 
         if (image == null) throw new RollBackException("no image found with id="+id);
-        if (!rwToken.equals(image.getToken().getRwToken())) throw new RollBackException("incorrect token: " + rwToken + " for image id=" + id);
+        if (!rwToken.equals(image.getToken().getWriteToken())) throw new RollBackException("incorrect token: " + rwToken + " for image id=" + id);
 
         return image;
     }

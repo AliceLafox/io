@@ -86,8 +86,8 @@ public class ImageControllerTest {
     @Test
     public void testGetOneImageBody() throws Exception {
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
-        upload2Files(token.getRwToken());
-        Image img = imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+        upload2Files(token.getWriteToken());
+        Image img = imageService.getImages(tokenService.findByRwToken(token.getWriteToken())).get(1);
 
 //        "{id:\\d+}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d}.{ext:png|jpg|gif}"
 
@@ -124,24 +124,24 @@ public class ImageControllerTest {
     @Test
     public void testGetImages() throws Exception {
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
-        upload2Files(token.getRwToken());
+        upload2Files(token.getWriteToken());
 
-        mockMvc.perform(get("/image/list/" + token.getRoToken()))
+        mockMvc.perform(get("/image/list/" + token.getReadToken()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.images").isNotEmpty())
                 .andDo(MockMvcResultHandlers.print())
         ;
-        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(delete("/image/delete/" + img.getId())
-                .param("token", img.getToken().getRwToken()))
+                .param("token", img.getToken().getWriteToken()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        mockMvc.perform(get("/image/list/" + token.getRoToken()))
+        mockMvc.perform(get("/image/list/" + token.getReadToken()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.imagesDeleted").isNotEmpty())
@@ -154,7 +154,7 @@ public class ImageControllerTest {
     public void testImageUpload() throws Exception {
 
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
-        upload2Files(token.getRwToken());
+        upload2Files(token.getWriteToken());
 
     }
 
@@ -162,9 +162,9 @@ public class ImageControllerTest {
     public void testImageUpdate() throws Exception {
 
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
-        upload2Files(token.getRwToken());
+        upload2Files(token.getWriteToken());
 
-        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getWriteToken())).get(1);
 
         File file3=new File(UPLOAD_DIR + "/testImage3.jpg");
         MockMultipartFile image3 = new MockMultipartFile("data", "testImage3.jpg", "image/jpg", new FileInputStream(file3));
@@ -173,12 +173,12 @@ public class ImageControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.fileUpload("/image/update/" + img.getId())
                 .file(image3)
-                .param("token", token.getRwToken()))
+                .param("token", token.getWriteToken()))
                 .andExpect(status().isOk())
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
-        Image imgNew=imageService.getImage(img.getId(),token.getRwToken());
+        Image imgNew=imageService.getImage(img.getId(),token.getWriteToken());
 
         Assert.assertEquals(img.getVersion()+1,imgNew.getVersion());
         Assert.assertTrue(img.getModified().compareTo(imgNew.getModified()) == -1);
@@ -212,17 +212,17 @@ public class ImageControllerTest {
     @Test
     public void testImageDelete() throws Exception {
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
-        upload2Files(token.getRwToken());
-        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+        upload2Files(token.getWriteToken());
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(delete("/image/delete/" + img.getId())
-                .param("token", img.getToken().getRwToken()))
+                .param("token", img.getToken().getWriteToken()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImage(img.getId(),token.getRwToken());
+        Image imgNew=imageService.getImage(img.getId(),token.getWriteToken());
 
         Assert.assertTrue(img.isActive());
         Assert.assertFalse(imgNew.isActive());
@@ -232,17 +232,17 @@ public class ImageControllerTest {
     @Test
     public void testSetAvatarImage() throws Exception {
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
-        upload2Files(token.getRwToken());
-        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+        upload2Files(token.getWriteToken());
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(post("/image/avatar/" + img.getId())
-                .param("token", img.getToken().getRwToken()))
+                .param("token", img.getToken().getWriteToken()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImage(img.getId(),token.getRwToken());
+        Image imgNew=imageService.getImage(img.getId(),token.getWriteToken());
 
         Assert.assertFalse(img.isAvatar());
         Assert.assertTrue(imgNew.isAvatar());
@@ -254,11 +254,11 @@ public class ImageControllerTest {
     public void testSetTitle() throws Exception {
         String title="this is the title of image";
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
-        upload2Files(token.getRwToken());
-        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+        upload2Files(token.getWriteToken());
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(post("/image/title/" + img.getId())
-                .param("token", img.getToken().getRwToken())
+                .param("token", img.getToken().getWriteToken())
                 .param("title", title)
         )
                 .andExpect(status().isOk())
@@ -266,7 +266,7 @@ public class ImageControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImage(img.getId(),token.getRwToken());
+        Image imgNew=imageService.getImage(img.getId(),token.getWriteToken());
 
         Assert.assertNull(img.getTitle());
         Assert.assertTrue(imgNew.getTitle().equals(title));
@@ -278,11 +278,11 @@ public class ImageControllerTest {
     public void testSetDescription() throws Exception {
         String description="this is the description of image";
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
-        upload2Files(token.getRwToken());
-        Image img=imageService.getImages(tokenService.findByRwToken(token.getRwToken())).get(1);
+        upload2Files(token.getWriteToken());
+        Image img=imageService.getImages(tokenService.findByRwToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(post("/image/description/" + img.getId())
-                .param("token", img.getToken().getRwToken())
+                .param("token", img.getToken().getWriteToken())
                 .param("description", description)
         )
                 .andExpect(status().isOk())
@@ -290,7 +290,7 @@ public class ImageControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImage(img.getId(),token.getRwToken());
+        Image imgNew=imageService.getImage(img.getId(),token.getWriteToken());
 
         Assert.assertNull(img.getDescription());
         Assert.assertTrue(imgNew.getDescription().equals(description));

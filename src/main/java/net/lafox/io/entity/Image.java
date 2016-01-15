@@ -3,7 +3,6 @@ package net.lafox.io.entity;
 
 import org.springframework.beans.BeanUtils;
 
-import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
@@ -13,17 +12,12 @@ import java.util.Date;
  * Lafox.Net Software Developers Team http://dev.lafox.net
  */
 
-@Entity
-@Table(name = "image")
 public class Image implements Serializable {
 
     private static final long serialVersionUID = 679756698908629665L;
-    @Id
-    @GeneratedValue
     private Long id;
 
     @NotNull
-    @ManyToOne(optional = false)
     private Token token;
 
     private int sortIndex;
@@ -41,10 +35,6 @@ public class Image implements Serializable {
     private boolean active;
     private boolean avatar;
 
-    @PreUpdate
-    public void setLastUpdate() {
-        this.modified = new Date();
-    }
 
     public Image(Token token) {
         this.token = token;

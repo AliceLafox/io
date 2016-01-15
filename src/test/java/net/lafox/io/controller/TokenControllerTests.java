@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.Random;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -29,6 +31,7 @@ public class TokenControllerTests {
     WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
+    Random random = new Random();
 
     @Autowired
     TokenService tokenService;
@@ -42,7 +45,7 @@ public class TokenControllerTests {
     public void testAddToken() throws Exception {
         String siteName = "lafox.net";
         String ownerName = "item";
-        Long ownerId = 100L;
+        Long ownerId = random.nextLong();
         mockMvc.perform(post("/api/token/add")
                         .param("siteName", siteName)
                         .param("ownerName", ownerName)
@@ -51,9 +54,11 @@ public class TokenControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.token").exists())
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(jsonPath("$.writeToken").exists())
+                .andExpect(jsonPath("$.readToken").exists())
         ;
-        String token = tokenService.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId);
+        String writeToken = tokenService.findWriteTokenBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId);
 
         mockMvc.perform(post("/api/token/add")
                         .param("siteName", siteName)
@@ -63,7 +68,7 @@ public class TokenControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.token").value(token))
+                .andExpect(jsonPath("$.writeToken").value(writeToken))
         ;
     }
 

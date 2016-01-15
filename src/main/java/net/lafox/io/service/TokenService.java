@@ -12,7 +12,7 @@ import net.lafox.io.exceptions.RollBackException;
 public interface TokenService {
     Token addToken(String siteName, String ownerName, Long ownerId, String ip) throws RollBackException;
 
-    String findBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId);
+    String findWriteTokenBySiteNameAndOwnerNameAndOwnerId(String siteName, String ownerName, Long ownerId);
 
     Token findByRwToken(String rwToken);
 
