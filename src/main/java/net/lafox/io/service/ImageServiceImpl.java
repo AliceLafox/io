@@ -36,12 +36,11 @@ public class ImageServiceImpl implements ImageService {
     TokenService tokenService;
 
     @Override
-    public void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException {
-        tokenService.checkRwToken(token);
+    public void updateImage(Long id, String writeToken, MultipartFile mpf) throws RollBackException {
+        tokenService.checkWriteToken(writeToken);
 
         try {
-            Image image = this.getImage(id, token);
-            image.setVersion(image.getVersion() + 1);
+            Image image = this.getImageCheckByWriteToken(id, writeToken);
             image.setContentType(contentType(mpf));
             image.setFileName(mpf.getOriginalFilename());
             image.setSize(mpf.getSize());
@@ -50,8 +49,8 @@ public class ImageServiceImpl implements ImageService {
             image.setWidth(dim.width);
             image.setHeight(dim.height);
 
-            image.setActive(true);
-            imageDao.save(image);
+            imageDao.update(image);
+            image = imageDao.findOne(image.getId());
             mpf.transferTo(new File(imagePath(image)));
 
         } catch (IOException e) {
@@ -63,25 +62,29 @@ public class ImageServiceImpl implements ImageService {
     public String imagePath(Image image) {
         if (image == null || image.getId() == null) return UPLOAD_DIR + "/404.png";
 
-//        String ver=image.getV()==0?"":"_"+image.getV();
+        Token token = tokenService.findByTokenId(image.getTokenId());
+
         String ver = "_" + image.getVersion();
-        return UPLOAD_DIR + "/" + image.getToken().getSiteName() + "/" + image.getId() + ver + ".jpg";
+        return UPLOAD_DIR + "/" + token.getSiteName() + "/" + image.getId() + ver + ".jpg";
     }
 
     @Override
     public List<Image> getImages(Token token) {
-        return imageDao.findByTokenOrderBySortIndex(token);
+        return imageDao.findByTokenId(token.getId());
     }
 
     @Override
-    public Image getImage(Long id, String rwToken) throws RollBackException {
-        if (rwToken == null) throw new RollBackException("token is NULL for image id=" + id);
-        if (rwToken.isEmpty()) throw new RollBackException("token is EMPTY for image id=" + id);
+    public Image getImageCheckByWriteToken(Long id, String writeToken) throws RollBackException {
+        if (writeToken == null) throw new RollBackException("token is NULL for image id=" + id);
+        if (writeToken.isEmpty()) throw new RollBackException("token is EMPTY for image id=" + id);
 
         Image image = imageDao.findOne(id);
 
         if (image == null) throw new RollBackException("no image found with id="+id);
-        if (!rwToken.equals(image.getToken().getWriteToken())) throw new RollBackException("incorrect token: " + rwToken + " for image id=" + id);
+
+        Token token = tokenService.findByTokenId(image.getTokenId());
+
+        if (!writeToken.equals(token.getWriteToken())) throw new RollBackException("incorrect token: " + writeToken + " for image id=" + id);
 
         return image;
     }
@@ -100,14 +103,14 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Long addImage(String token, MultipartFile mpf) throws RollBackException {
 
-        Token checkedToken = tokenService.checkRwToken(token);
+        Token checkedToken = tokenService.checkWriteToken(token);
         try {
-            Image image = new Image(checkedToken,contentType(mpf), mpf.getOriginalFilename(), mpf.getSize());
+            Image image = new Image(checkedToken.getId(),contentType(mpf), mpf.getOriginalFilename(), mpf.getSize());
             Dimension dim = ImgUtils.imgDimension(mpf.getBytes());
             image.setWidth(dim.width);
             image.setHeight(dim.height);
-            image.setActive(true);
-            imageDao.save(image);
+
+            imageDao.insert(image);
             mpf.transferTo(new File(imagePath(image)));
             return image.getId();
 
@@ -117,41 +120,45 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void deleteImage(Long id, String token) throws RollBackException {
-        Image image=getImage(id, token);
-        image.setActive(false);
-        imageDao.save(image);
+    public void deleteImage(Long id, String writeToken) throws RollBackException {
+        Image image= getImageCheckByWriteToken(id, writeToken);
+        imageDao.delete(image.getId());
     }
 
     @Override
-    public void setAvatar(Long id, String rwToken) throws RollBackException {
+    public void setAvatar(Long id, String writeToken) throws RollBackException {
 
         if (id==null) throw new RollBackException("id can not be null");
-        Token token = tokenService.checkRwToken(rwToken);
-        for (Image image : this.getImages(token)) {
-            if (!image.isAvatar()) {
-                if (id.equals(image.getId())) {
-                    image.setAvatar(true);
-                    imageDao.save(image);
-                }
-            } else{
-                if (!id.equals(image.getId())) {
-                    image.setAvatar(false);
-                    imageDao.save(image);
-                }
-            }
-        }
+        tokenService.checkWriteToken(writeToken);
+
+        imageDao.avatar(id);
+
+//        for (Image image : this.getImages(token)) {
+//            if (!image.isAvatar()) {
+//                if (id.equals(image.getId())) {
+//                    image.setAvatar(true);
+//                    imageDao.save(image);
+//                }
+//            } else{
+//                if (!id.equals(image.getId())) {
+//                    image.setAvatar(false);
+//                    imageDao.save(image);
+//                }
+//            }
+//        }
     }
 
     @Override
-    public void getImagesByRoToken(String roToken, Map<String, Object> map) throws RollBackException {
+    public void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException {
 
         try {
             map.put("images", new ArrayList<>());
             map.put("imagesDeleted", new ArrayList<>());
             map.put("avatar", null);
 
-            for (Image image : imageDao.getImagesByRoToken(roToken)) {
+            Token token=tokenService.findByReadToken(readToken);
+
+            for (Image image : imageDao.findByTokenId(token.getId())) {
                 if (image.isActive()) {
                     ((List) map.get("images")).add(image.asDto());
                 } else {
@@ -168,25 +175,23 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void setTitle(Long id, String rwToken, String title) throws RollBackException {
+    public void setTitle(Long id, String writeToken, String title) throws RollBackException {
         if (title == null || title.isEmpty()) return;
         if (id == null) throw new RollBackException("id can not be null");
-        tokenService.checkRwToken(rwToken);
+        tokenService.checkWriteToken(writeToken);
 
-        Image image = getImage(id, rwToken);
-        image.setTitle(title);
-        imageDao.save(image);
+        getImageCheckByWriteToken(id, writeToken);
+        imageDao.title(id, title);
     }
 
     @Override
     public void setDescription(Long id, String rwToken, String description) throws RollBackException {
         if (description == null || description.isEmpty()) return;
         if (id == null) throw new RollBackException("id can not be null");
-        tokenService.checkRwToken(rwToken);
+        tokenService.checkWriteToken(rwToken);
 
-        Image image = getImage(id, rwToken);
-        image.setDescription(description);
-        imageDao.save(image);
+        getImageCheckByWriteToken(id, rwToken);
+        imageDao.description(id, description);
     }
 
 }

@@ -20,21 +20,21 @@ public interface ImageService {
 
     List<Image> getImages(Token token);
 
-    Image getImage(Long id, String token) throws RollBackException;
+    Image getImageCheckByWriteToken(Long id, String token) throws RollBackException;
 
     Image getImage(Long id);
 
-    Long addImage(String token, MultipartFile mpf) throws RollBackException;
+    Long addImage(String writeToken, MultipartFile mpf) throws RollBackException;
 
-    void updateImage(Long id, String token, MultipartFile mpf) throws RollBackException;
+    void updateImage(Long id, String writeToken, MultipartFile mpf) throws RollBackException;
 
-    void deleteImage(Long id, String token) throws RollBackException;
+    void deleteImage(Long id, String writeToken) throws RollBackException;
 
-    void setAvatar(Long id, String token) throws RollBackException;
+    void setAvatar(Long id, String writeToken) throws RollBackException;
 
-    void getImagesByRoToken(String roToken,Map<String, Object> map) throws RollBackException;
+    void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException;
 
-    void setTitle(Long id, String token, String title) throws RollBackException;
+    void setTitle(Long id, String writeToken, String title) throws RollBackException;
 
-    void setDescription(Long id, String rwToken, String description) throws RollBackException;
+    void setDescription(Long id, String writeToken, String description) throws RollBackException;
 }

@@ -142,7 +142,7 @@ public class ImageController {
         Map<String, Object> map = new HashMap<>();
         map.put("status", "OK");
             try {
-                imageService.getImagesByRoToken(roToken, map);
+                imageService.getImagesByReadToken(roToken, map);
             } catch (Exception e) {
                 map.put("status", "ERROR");
                 map.put("details", e.getMessage());

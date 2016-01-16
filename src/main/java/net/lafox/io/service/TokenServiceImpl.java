@@ -38,15 +38,33 @@ public class TokenServiceImpl implements TokenService {
         return tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId).getWriteToken();
     }
 
+
     @Override
-    public Token findByRwToken(String token) {
-        return tokenDao.findByRwToken(token);
+    public Token findByTokenId(Long tokenId) {
+        return tokenDao.findByTokenId(tokenId);
     }
 
     @Override
-    public Token checkRwToken(String token) throws RollBackException{
-        Token t=tokenDao.findByRwToken(token);
+    public Token checkWriteToken(String writeToken) throws RollBackException{
+        Token t=tokenDao.findByWriteToken(writeToken);
         if (t == null) throw new RollBackException("token not found");
         return t;
+    }
+
+    @Override
+    public Token findByWriteToken(String writeToken) {
+        return tokenDao.findByWriteToken(writeToken);
+    }
+
+    @Override
+    public Token checkReadToken(String readToken) throws RollBackException{
+        Token t=tokenDao.findByReadToken(readToken);
+        if (t == null) throw new RollBackException("token not found");
+        return t;
+    }
+
+    @Override
+    public Token findByReadToken(String readToken) {
+        return tokenDao.findByReadToken(readToken);
     }
 }

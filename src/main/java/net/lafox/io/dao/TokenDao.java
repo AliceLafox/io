@@ -17,11 +17,19 @@ public interface TokenDao {
                                                @Param("ownerName") String ownerName,
                                                @Param("ownerId") Long ownerId);
 
-    @Select("SELECT * FROM token WHERE r_roken = #{rToken}")
-    Token findByRwToken(@Param ("rToken") String rToken);
+
 
     @Insert("Insert into token (site_name, owner_name, owner_id, ip, write_token, read_token) " +
             "values(#{siteName},#{ownerName}, #{ownerId}, #{ip}, #{writeToken}, #{readToken})")
     @Options(useGeneratedKeys = true, keyProperty = "id", flushCache=true)
     void insert(Token token);
+
+    @Select("SELECT * FROM token WHERE id = #{tokenId}")
+    Token findByTokenId(@Param ("tokenId") Long tokenId);
+
+    @Select("SELECT * FROM token WHERE write_token = #{writeToken}")
+    Token findByWriteToken(@Param("writeToken") String writeToken);
+
+    @Select("SELECT * FROM token WHERE read_token = #{readToken}")
+    Token findByReadToken(@Param("readToken") String readToken);
 }

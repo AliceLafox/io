@@ -1,8 +1,7 @@
 package net.lafox.io.dao;
 
 import net.lafox.io.entity.Image;
-import net.lafox.io.entity.Token;
-import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -11,13 +10,45 @@ import java.util.List;
  * Lafox.Net Software Developers Team http://dev.lafox.net
  */
 
+
+
 public interface ImageDao {
-    List<Image> findByTokenOrderBySortIndex(Token token);
+    String SELECT_FIELDS=" id, sort_index, version, width, height, created, modified, content_type, file_name, title, description, size, active, avatar, token_id ";
+    String UPDATE_FIELDS=" " +
+            "version = version+1, " +
+            "modified = NOW(), " +
+            "width = #{width}, " +
+            "height = #{height}, " +
+            "content_type = #{contentType}, " +
+            "file_name = #{fileName}, " +
+            "size = #{size} ";
+    String INSERT_FIELDS=" (width, height, content_type, file_name, size, token_id) " +
+            "VALUES (#{width}, #{height}, #{contentType}, #{fileName}, #{size}, #{tokenId}) ";
 
-//    @Query("select i from Image i join i.token t where t.roToken = :roToken order by i.sortIndex desc")
-    List<Image> getImagesByRoToken(@Param(value = "roToken") String roToken);
+    @Select("SELECT " + SELECT_FIELDS + " FROM image WHERE token_id=#{tokenId} order by sort_index ASC")
+    List<Image> findByTokenId(@Param("tokenId") Long tokenId);
 
-    Image findOne(Long id);
-    void save(Image image);
+
+    @Select("SELECT " + SELECT_FIELDS + "FROM image WHERE id=#{id}")
+    Image findOne(@Param("id")Long id);
+
+    @Update("UPDATE image SET "+UPDATE_FIELDS + "WHERE id=#{id}")
+    void update(Image image);
+
+    @Insert("INSERT into image "+INSERT_FIELDS)
+    @Options(useGeneratedKeys = true, keyProperty = "id", flushCache=true)
+    void insert(Image image);
+
+    @Update("UPDATE image SET active = false WHERE id=#{id}")
+    void delete(@Param("id")Long id);
+
+    @Update("select setAvatar(#{id})")
+    void avatar(@Param("id")Long id);
+
+    @Update("UPDATE image SET title = #{title} WHERE id=#{id}")
+    void title(@Param("id")Long id, @Param("title") String title);
+
+    @Update("UPDATE image SET description = #{description} WHERE id=#{id}")
+    void description(@Param("id")Long id, @Param("description") String description);
 
 }

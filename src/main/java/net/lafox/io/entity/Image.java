@@ -17,9 +17,6 @@ public class Image implements Serializable {
     private static final long serialVersionUID = 679756698908629665L;
     private Long id;
 
-    @NotNull
-    private Token token;
-
     private int sortIndex;
     private int version;
     private int width;
@@ -35,13 +32,11 @@ public class Image implements Serializable {
     private boolean active;
     private boolean avatar;
 
+    private Long tokenId;
 
-    public Image(Token token) {
-        this.token = token;
-    }
 
-    public Image(Token token, String contentType, String fileName, Long size) {
-        this.token = token;
+    public Image(Long tokenId, String contentType, String fileName, Long size) {
+        this.tokenId=tokenId;
         this.contentType = contentType;
         this.fileName = fileName;
         this.size = size;
@@ -58,6 +53,15 @@ public class Image implements Serializable {
         imageDto.setV(version);
         return imageDto;
     }
+
+    public Long getTokenId() {
+        return tokenId;
+    }
+
+    public void setTokenId(Long tokenId) {
+        this.tokenId = tokenId;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -80,14 +84,6 @@ public class Image implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Token getToken() {
-        return token;
-    }
-
-    public void setToken(Token token) {
-        this.token = token;
     }
 
     public int getSortIndex() {

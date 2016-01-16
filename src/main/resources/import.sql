@@ -25,12 +25,32 @@ CREATE TABLE image
   width integer NOT NULL,
   height integer NOT NULL,
   size INTEGER NOT NULL ,
-  sort_index integer NOT NULL,
+  sort_index integer NOT NULL DEFAULT 0,
   title text,
-  version integer NOT NULL,
+  version integer NOT NULL DEFAULT 0,
   token_id bigint NOT NULL,
   img bytea,
   CONSTRAINT fk_s9jvy93oe9ypncv5vaxy83eky FOREIGN KEY (token_id)
       REFERENCES token (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+
+DROP FUNCTION IF EXISTS setAvatar(bigint);
+
+CREATE OR REPLACE FUNCTION setAvatar(_id bigint) RETURNS void AS
+  $BODY$
+    DECLARE
+      _token_id BIGINT;
+  BEGIN
+    SELECT token_id INTO _token_id FROM image WHERE id = _id;
+      IF NOT FOUND
+      THEN
+        RETURN;
+      END IF;
+    UPDATE image SET avatar=false where token_id=_token_id and id != _id;
+    UPDATE image SET avatar=true where id = _id;
+
+  END
+  $BODY$
+LANGUAGE plpgsql VOLATILE;
