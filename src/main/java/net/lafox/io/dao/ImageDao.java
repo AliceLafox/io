@@ -55,4 +55,6 @@ public interface ImageDao {
     @Update("UPDATE image SET description = #{description} WHERE id=#{id}")
     void description(@Param("id")Long id, @Param("description") String description);
 
+
+
 }

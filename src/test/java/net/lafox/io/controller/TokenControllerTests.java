@@ -2,6 +2,7 @@ package net.lafox.io.controller;
 
 import net.lafox.io.IoApplication;
 import net.lafox.io.service.TokenService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,9 +42,14 @@ public class TokenControllerTests {
         mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
+    @After
+    public void tearDown() throws Exception {
+        tokenService.cleanupAfterTests();
+    }
+
     @Test
     public void testAddToken() throws Exception {
-        String siteName = "lafox.net";
+        String siteName = "test-domain";
         String ownerName = "item";
         Long ownerId = random.nextLong();
         mockMvc.perform(post("/api/token/add")
@@ -74,12 +80,6 @@ public class TokenControllerTests {
 
     @Test
     public void testEmptyFieldsWhenAddToken() throws Exception {
-        mockMvc.perform(post("/api/token/add"))
-                .andDo(MockMvcResultHandlers.print())
-                .andExpect(status().reason(containsString("Required String parameter")))
-                .andExpect(status().reason("Required String parameter 'siteName' is not present"))
-        ;
-
         mockMvc.perform(post("/api/token/add")
                         .param("siteName", "")
                         .param("ownerName", "")

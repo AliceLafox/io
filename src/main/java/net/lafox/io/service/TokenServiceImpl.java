@@ -67,4 +67,9 @@ public class TokenServiceImpl implements TokenService {
     public Token findByReadToken(String readToken) {
         return tokenDao.findByReadToken(readToken);
     }
+
+    @Override
+    public void cleanupAfterTests(){
+        tokenDao.cleanupAfterTests();
+    };
 }

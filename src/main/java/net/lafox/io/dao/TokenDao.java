@@ -1,10 +1,7 @@
 package net.lafox.io.dao;
 
 import net.lafox.io.entity.Token;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 /**
  * Created by Alice Lafox <alice@lafox.net> on 22.12.15
@@ -32,4 +29,7 @@ public interface TokenDao {
 
     @Select("SELECT * FROM token WHERE read_token = #{readToken}")
     Token findByReadToken(@Param("readToken") String readToken);
+
+    @Delete("DELETE from token where site_name='test-domain'")
+    void cleanupAfterTests();
 }

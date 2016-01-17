@@ -23,4 +23,6 @@ public interface TokenService {
     Token checkReadToken(String readToken) throws RollBackException;
 
     Token findByReadToken(String readToken);
+
+    void cleanupAfterTests();
 }

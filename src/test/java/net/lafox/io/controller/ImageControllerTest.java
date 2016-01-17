@@ -73,6 +73,7 @@ Random random = new Random();
 
     @After
     public void tearDown() throws Exception {
+        tokenService.cleanupAfterTests();
     }
 
 
