@@ -6,6 +6,7 @@ import net.coobird.thumbnailator.geometry.Positions;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,14 +21,37 @@ public class ImgProcessing {
 
     public static Thumbnails.Builder width(File src, int width) throws IOException {
         return  Thumbnails.of(src).width(width);
+    }   
+    
+    public static Thumbnails.Builder width(byte[] src, int width) throws IOException {
+        return  Thumbnails.of(new ByteArrayInputStream(src)).width(width);
     }
 
     public static Thumbnails.Builder height(File src, int width) throws IOException {
         return  Thumbnails.of(src).height(width);
+    }    
+    
+    public static Thumbnails.Builder height(byte[] src, int width) throws IOException {
+        return  Thumbnails.of(new ByteArrayInputStream(src)).height(width);
     }
 
     public static  Thumbnails.Builder crop(File src, int width, int height) throws IOException {
-        BufferedImage bi =ImageIO.read(new FileInputStream(src));
+        return crop(ImageIO.read(new FileInputStream(src)),width, height);
+    }     
+    
+    public static  Thumbnails.Builder crop(byte[] src, int width, int height) throws IOException {
+        return crop(ImageIO.read(new ByteArrayInputStream(src)),width, height);
+    }
+
+    public static Thumbnails.Builder expand(File src, int width, int height) throws IOException {
+        return expand(ImageIO.read(new FileInputStream(src)),width, height);
+    }
+
+    public static Thumbnails.Builder expand(byte[] src, int width, int height) throws IOException {
+        return expand(ImageIO.read(new ByteArrayInputStream(src)), width, height);
+    }
+
+    public static  Thumbnails.Builder crop(BufferedImage bi, int width, int height) throws IOException {
         double wOrig = (double) bi.getWidth();
         double hOrig = (double) bi.getHeight();
         double wCrop, hCrop;
@@ -43,8 +67,7 @@ public class ImgProcessing {
         return Thumbnails.of(bi).sourceRegion(Positions.CENTER, i(wCrop), i(hCrop)).forceSize(width, height);
     }
 
-    public static Thumbnails.Builder expand(File file, int width, int height) throws IOException {
-        BufferedImage src =ImageIO.read(new FileInputStream(file));
+    public static Thumbnails.Builder expand(BufferedImage src, int width, int height) throws IOException {
 
         double wOrig = (double) src.getWidth();
         double hOrig = (double) src.getHeight();

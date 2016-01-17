@@ -3,7 +3,6 @@ package net.lafox.io.entity;
 
 import org.springframework.beans.BeanUtils;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -33,6 +32,7 @@ public class Image implements Serializable {
     private boolean avatar;
 
     private Long tokenId;
+    private byte[] content;
 
 
     public Image(Long tokenId, String contentType, String fileName, Long size) {
@@ -52,6 +52,14 @@ public class Image implements Serializable {
         BeanUtils.copyProperties(this, imageDto);
         imageDto.setV(version);
         return imageDto;
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
+
+    public void setContent(byte[] content) {
+        this.content = content;
     }
 
     public Long getTokenId() {

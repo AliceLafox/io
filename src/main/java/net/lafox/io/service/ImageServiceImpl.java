@@ -6,13 +6,11 @@ import net.lafox.io.entity.Token;
 import net.lafox.io.exceptions.RollBackException;
 import net.lafox.io.utils.ImgUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +24,6 @@ import java.util.Map;
 @Service
 @Transactional(rollbackFor = RollBackException.class)
 public class ImageServiceImpl implements ImageService {
-    @Value("${upload.dir}")
-    private String UPLOAD_DIR;
-
 
     @Autowired
     ImageDao imageDao;
@@ -48,24 +43,13 @@ public class ImageServiceImpl implements ImageService {
             Dimension dim = ImgUtils.imgDimension(mpf.getBytes());
             image.setWidth(dim.width);
             image.setHeight(dim.height);
+            image.setContent(mpf.getBytes());
 
             imageDao.update(image);
-            image = imageDao.findOne(image.getId());
-            mpf.transferTo(new File(imagePath(image)));
 
         } catch (IOException e) {
             throw new RollBackException(e);
         }
-    }
-
-    @Override
-    public String imagePath(Image image) {
-        if (image == null || image.getId() == null) return UPLOAD_DIR + "/404.png";
-
-        Token token = tokenService.findByTokenId(image.getTokenId());
-
-        String ver = "_" + image.getVersion();
-        return UPLOAD_DIR + "/" + token.getSiteName() + "/" + image.getId() + ver + ".jpg";
     }
 
     @Override
@@ -95,6 +79,11 @@ public class ImageServiceImpl implements ImageService {
         return imageDao.findOne(id);
     }
 
+    @Override
+    public byte[] getImageContent(Long id) {
+        return (byte[]) imageDao.getImageContent(id);
+    }
+
     private String contentType(MultipartFile mpf){
 
         return "image/jpg".equals(mpf.getContentType())?"image/jpeg": mpf.getContentType();
@@ -109,9 +98,9 @@ public class ImageServiceImpl implements ImageService {
             Dimension dim = ImgUtils.imgDimension(mpf.getBytes());
             image.setWidth(dim.width);
             image.setHeight(dim.height);
-
+            image.setContent(mpf.getBytes());
             imageDao.insert(image);
-            mpf.transferTo(new File(imagePath(image)));
+
             return image.getId();
 
         } catch (IOException e) {
@@ -132,20 +121,6 @@ public class ImageServiceImpl implements ImageService {
         tokenService.checkWriteToken(writeToken);
 
         imageDao.avatar(id);
-
-//        for (Image image : this.getImages(token)) {
-//            if (!image.isAvatar()) {
-//                if (id.equals(image.getId())) {
-//                    image.setAvatar(true);
-//                    imageDao.save(image);
-//                }
-//            } else{
-//                if (!id.equals(image.getId())) {
-//                    image.setAvatar(false);
-//                    imageDao.save(image);
-//                }
-//            }
-//        }
     }
 
     @Override

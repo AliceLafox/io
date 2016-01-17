@@ -5,7 +5,6 @@ import net.lafox.io.entity.Image;
 import net.lafox.io.service.ImageService;
 import net.lafox.io.utils.ImgProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,9 +31,6 @@ import java.util.Map;
 @RequestMapping("")
 public class RootController {
 
-    @Value("${upload.dir}")
-    private String UPLOAD_DIR;
-
     @Autowired
     ImageService imageService;
 
@@ -45,7 +41,6 @@ public class RootController {
         put("gif", MediaType.IMAGE_GIF);
         put("jpg", MediaType.IMAGE_JPEG);
     }};
-
 
     @RequestMapping(value = "{id:\\d+}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d+}.{ext:png|jpg|gif}", method = RequestMethod.GET)
     @ResponseBody
@@ -61,13 +56,16 @@ public class RootController {
         HttpStatus httpStatus = HttpStatus.OK;
 
         Image image = imageService.getImage(id);
+        byte[] file;
 
         if (image == null) {//to return 404.png
             image = new Image();
             httpStatus = HttpStatus.NOT_FOUND;
+//            file = Files.readAllBytes(new File("classpath:404.png").toPath());
+            file = Files.readAllBytes(new File(this.getClass().getClassLoader().getResource("404.png").getFile()).toPath());
+        } else {
+            file = imageService.getImageContent(id);
         }
-
-        File file = new File(imageService.imagePath(image));
 
         final HttpHeaders headers = new HttpHeaders();
         headers.setExpires(EXP);
@@ -91,7 +89,7 @@ public class RootController {
                 break;
             default://orig
                 headers.setContentType(MediaType.parseMediaType(image.getContentType()));
-                return new ResponseEntity<>(Files.readAllBytes(file.toPath()), headers, httpStatus);
+                return new ResponseEntity<>(file, headers, httpStatus);
         }
 
         byte[] imgBytes = null;

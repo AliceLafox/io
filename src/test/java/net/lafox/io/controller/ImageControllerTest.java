@@ -6,7 +6,6 @@ import net.lafox.io.entity.Token;
 import net.lafox.io.service.ImageService;
 import net.lafox.io.service.TokenService;
 import net.lafox.io.utils.ImgUtils;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -29,7 +28,6 @@ import org.springframework.web.context.WebApplicationContext;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.Files;
 import java.util.Random;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -52,7 +50,6 @@ public class ImageControllerTest {
     private String ownerName;
     private static Long ownerId = null;
     private String ip;
-    File workingDir;
 
 
     @Autowired
@@ -70,17 +67,12 @@ Random random = new Random();
         ownerId = (ownerId == null) ? random.nextLong() : ownerId++;
          ip = "10.10.10.10";
 
-        workingDir=new File(UPLOAD_DIR+"/"+siteName);
-        if (!workingDir.exists()) {
-            //noinspection ResultOfMethodCallIgnored
-            workingDir.mkdir();
-        }
+
 
     }
 
     @After
     public void tearDown() throws Exception {
-        FileUtils.cleanDirectory(workingDir);
     }
 
 
@@ -89,13 +81,14 @@ Random random = new Random();
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getWriteToken());
         Image img = imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        byte[] imgContent =imageService.getImageContent(img.getId());
 
 //        "{id:\\d+}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d}.{ext:png|jpg|gif}"
 
         mockMvc.perform(get("/" + img.getId() + "-w100-h100-oo-q50-v222.png"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
-                .andExpect(content().bytes(Files.readAllBytes(new File(imageService.imagePath(img)).toPath())))
+                .andExpect(content().bytes(imgContent))
         ;
 
         int w = 100;
@@ -187,9 +180,6 @@ Random random = new Random();
         Assert.assertEquals(file3.length(), imgNew.getSize().longValue());
         Assert.assertEquals(file3.getName(), imgNew.getFileName());
 
-        File fileOnDisk=new File(imageService.imagePath(imgNew));
-        Assert.assertEquals(fileOnDisk.length(), imgNew.getSize().longValue());
-
     }
 
     private void upload2Files(String rwToken) throws Exception {
@@ -205,10 +195,6 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        for (Image img : imageService.getImages(tokenService.findByWriteToken(rwToken))) {
-            File fileOnDisk = new File(imageService.imagePath(img));
-            Assert.assertEquals(img.getSize().longValue(), fileOnDisk.length());
-        }
     }
 
     @Test

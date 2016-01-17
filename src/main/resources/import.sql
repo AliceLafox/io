@@ -12,6 +12,9 @@ CREATE TABLE token
   CONSTRAINT uk_7b7h1kjeu7jlutl05adx72sq5 UNIQUE (site_name, owner_name, owner_id)
 );
 
+insert into token(created, ip, owner_id, owner_name, read_token, write_token, site_name) VALUES
+  (NOW(),'10.10.10.10','1','test','readToken','writeToken','test');
+
 CREATE TABLE image
 (
   id BIGSERIAL NOT NULL PRIMARY KEY,
@@ -29,7 +32,7 @@ CREATE TABLE image
   title text,
   version integer NOT NULL DEFAULT 0,
   token_id bigint NOT NULL,
-  img bytea,
+  content bytea,
   CONSTRAINT fk_s9jvy93oe9ypncv5vaxy83eky FOREIGN KEY (token_id)
       REFERENCES token (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE NO ACTION

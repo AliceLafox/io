@@ -2,12 +2,12 @@
     <div class="panel-body">
 
 <form name="uploadFilesForm" novalidate enctype="multipart/form-data"
-      ng-submit="uploadFilesForm.$valid && submit('rw-token') ">
+      ng-submit="uploadFilesForm.$valid && submit('writeToken') ">
     <div class="btn btn-primary" ngf-select ng-model="files" ngf-multiple="true"
          ngf-pattern="'image/*'" ngf-accept="'image/*'" ngf-max-size="20MB" ngf-min-height="100">Select Images
     </div>
     <button type="submit" class="btn">Upload</button>
-    <button type="submit" class="btn" ng-click="loadImages('ro-token')">Refresh</button>
+    <button type="submit" class="btn" ng-click="loadImages('readToken')">Refresh</button>
 </form>
 
 

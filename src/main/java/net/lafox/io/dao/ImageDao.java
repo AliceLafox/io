@@ -21,9 +21,10 @@ public interface ImageDao {
             "height = #{height}, " +
             "content_type = #{contentType}, " +
             "file_name = #{fileName}, " +
-            "size = #{size} ";
-    String INSERT_FIELDS=" (width, height, content_type, file_name, size, token_id) " +
-            "VALUES (#{width}, #{height}, #{contentType}, #{fileName}, #{size}, #{tokenId}) ";
+            "size = #{size}, " +
+            "content = #{content}";
+    String INSERT_FIELDS=" (width, height, content_type, file_name, size, token_id, content) " +
+            "VALUES (#{width}, #{height}, #{contentType}, #{fileName}, #{size}, #{tokenId}, #{content}) ";
 
     @Select("SELECT " + SELECT_FIELDS + " FROM image WHERE token_id=#{tokenId} order by sort_index ASC")
     List<Image> findByTokenId(@Param("tokenId") Long tokenId);
@@ -31,6 +32,9 @@ public interface ImageDao {
 
     @Select("SELECT " + SELECT_FIELDS + "FROM image WHERE id=#{id}")
     Image findOne(@Param("id")Long id);
+
+    @Select("SELECT content FROM image WHERE id=#{id}")
+    Object getImageContent(@Param("id")Long id);
 
     @Update("UPDATE image SET "+UPDATE_FIELDS + "WHERE id=#{id}")
     void update(Image image);

@@ -16,13 +16,15 @@ import java.util.Map;
 
 public interface ImageService {
 
-    String imagePath(Image image);
+//    String imagePath(Image image);
 
     List<Image> getImages(Token token);
 
     Image getImageCheckByWriteToken(Long id, String token) throws RollBackException;
 
     Image getImage(Long id);
+
+    byte[] getImageContent(Long id);
 
     Long addImage(String writeToken, MultipartFile mpf) throws RollBackException;
 

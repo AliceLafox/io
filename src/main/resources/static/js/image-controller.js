@@ -15,12 +15,12 @@ angular.module('science')
 
     };
 
-    $scope.loadImages('ro-token');
+    $scope.loadImages('readToken');
 
     $scope.deleteImage = function (imageId, token) {
         $http.delete(wUrl + 'delete/' + imageId, {params: {token: token}})
             .success(function (data) {
-                $scope.loadImages('ro-token');
+                $scope.loadImages('readToken');
             });
     };
 
@@ -31,7 +31,7 @@ angular.module('science')
                     url: wUrl + 'upload',
                     data: {data: files[i], token: token}
                 }).success(function () {
-                    $scope.loadImages('ro-token');
+                    $scope.loadImages('readToken');
                 }).then(function (resp) {
                     console.log('Success ' + resp.config.data.data.name + ' uploaded. Response: ' + resp.data);
                 });
