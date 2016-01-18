@@ -1,5 +1,6 @@
 package net.lafox.io.service;
 
+import net.bull.javamelody.MonitoredWithSpring;
 import net.lafox.io.dao.ImageDao;
 import net.lafox.io.entity.Image;
 import net.lafox.io.entity.Token;
@@ -22,6 +23,7 @@ import java.util.Map;
  */
 
 @Service
+@MonitoredWithSpring
 @Transactional(rollbackFor = RollBackException.class)
 public class ImageServiceImpl implements ImageService {
 

@@ -1,5 +1,6 @@
 package net.lafox.io.controller;
 
+import net.bull.javamelody.MonitoredWithSpring;
 import net.coobird.thumbnailator.Thumbnails;
 import net.lafox.io.entity.Image;
 import net.lafox.io.service.ImageService;
@@ -28,6 +29,7 @@ import java.util.Map;
  * Lafox.Net Software developers Team http://dev.lafox.net
  */
 @Controller
+@MonitoredWithSpring
 @RequestMapping("")
 public class RootController {
 

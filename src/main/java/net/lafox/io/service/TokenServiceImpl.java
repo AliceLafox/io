@@ -1,5 +1,6 @@
 package net.lafox.io.service;
 
+import net.bull.javamelody.MonitoredWithSpring;
 import net.lafox.io.dao.TokenDao;
 import net.lafox.io.entity.Token;
 import net.lafox.io.exceptions.RollBackException;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Service
+@MonitoredWithSpring
 @Transactional(rollbackFor = RollBackException.class)
 public class TokenServiceImpl implements TokenService {
 

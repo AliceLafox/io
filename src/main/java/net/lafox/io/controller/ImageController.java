@@ -1,5 +1,6 @@
 package net.lafox.io.controller;
 
+import net.bull.javamelody.MonitoredWithSpring;
 import net.lafox.io.exceptions.RollBackException;
 import net.lafox.io.service.ImageService;
 import net.lafox.io.service.TokenService;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("image")
+@MonitoredWithSpring
 @CrossOrigin(origins = "*")
 public class ImageController {
 
