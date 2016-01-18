@@ -36,12 +36,23 @@ public class ImageReadController {
         Map<String, Object> map = new HashMap<>();
         map.put("status", "OK");
             try {
-                imageReadService.getImagesByReadToken(readToken, map);
+                map.put("images", imageReadService.getImagesByReadToken(readToken));
             } catch (Exception e) {
                 map.put("status", "ERROR");
                 map.put("details", e.getMessage());
             }
         return map;
     }
-
+    @RequestMapping(value = "avatar/{readToken}", method = RequestMethod.GET)
+    public synchronized Map<String, Object> avatar(@PathVariable String readToken) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("status", "OK");
+        try {
+            map.put("avatar", imageReadService.getAvatarByReadToken(readToken));
+        } catch (Exception e) {
+            map.put("status", "ERROR");
+            map.put("details", e.getMessage());
+        }
+        return map;
+    }
 }

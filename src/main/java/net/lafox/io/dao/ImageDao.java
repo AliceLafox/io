@@ -14,12 +14,12 @@ import java.util.List;
 
 public interface ImageDao {
     String SELECT_FIELDS="" +
-            " id," +
+            " i.id," +
             " sort_index," +
             " version," +
             " width," +
             " height," +
-            " created," +
+            " i.created," +
             " modified," +
             " content_type," +
             " file_name," +
@@ -42,11 +42,20 @@ public interface ImageDao {
     String INSERT_FIELDS=" (width, height, content_type, file_name, size, token_id, content) " +
             "VALUES (#{width}, #{height}, #{contentType}, #{fileName}, #{size}, #{tokenId}, #{content}) ";
 
-    @Select("SELECT " + SELECT_FIELDS + " FROM image WHERE token_id=#{tokenId} order by sort_index ASC")
+    @Select("SELECT " + SELECT_FIELDS + " FROM image i WHERE token_id=#{tokenId} order by sort_index ASC")
     List<Image> findByTokenId(@Param("tokenId") Long tokenId);
 
+    @Select("SELECT " + SELECT_FIELDS + " FROM image i " +
+            " LEFT JOIN token t ON(i.token_id=t.id) " +
+            " WHERE t.read_token=#{readToken} order by sort_index ASC")
+    List<Image> findImageListByReadToken(@Param("readToken") String readToken);
 
-    @Select("SELECT " + SELECT_FIELDS + "FROM image WHERE id=#{id}")
+    @Select("SELECT " + SELECT_FIELDS + " FROM image i " +
+            " LEFT JOIN token t ON(i.token_id=t.id) " +
+            " WHERE t.read_token=#{readToken} AND avatar=true limit 1")
+    Image findAvatarByReadToken(@Param("readToken") String readToken);
+
+    @Select("SELECT " + SELECT_FIELDS + "FROM image i WHERE id=#{id}")
     Image findOne(@Param("id")Long id);
 
     @Select("SELECT count(*) FROM image i " +

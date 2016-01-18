@@ -17,7 +17,8 @@ import java.util.Map;
 public interface ImageReadService {
 
     List<Image> getImages(Token token);
-    void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException;
+    List<Image> getImagesByReadToken(String readToken) throws RollBackException;
+    Image getAvatarByReadToken(String readToken) throws RollBackException;
     Image findOne(Long id);
 
 

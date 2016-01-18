@@ -32,6 +32,35 @@ public class ImageWriteServiceImpl implements ImageWriteService {
     @Autowired
     TokenService tokenService;
 
+    private String contentType(MultipartFile mpf){
+        return "image/jpg".equals(mpf.getContentType())?"image/jpeg": mpf.getContentType();
+    }
+
+    @Override
+    public void checkImagePermissionByImageIdAndWriteToken(Long id, String writeToken) throws RollBackException {
+        if (id == null) throw new RollBackException("image_id is NULL");
+        if (id < 1) throw new RollBackException("image_id (" + id + ") is less that 1");
+        if (writeToken == null) throw new RollBackException("token is NULL for image id=" + id);
+        if (writeToken.isEmpty()) throw new RollBackException("token is EMPTY for image id=" + id);
+        if (imageDao.countByImageIdAndWriteToken(id, writeToken) <1) throw new RollBackException("no image found with image_id=" + id + " and writeToken=" + writeToken);
+    }
+
+    @Override
+    public Long addImage(String token, MultipartFile mpf) throws RollBackException {
+        Token checkedToken = tokenService.checkWriteToken(token);
+        try {
+            Image image = new Image(checkedToken.getId(),contentType(mpf), mpf.getOriginalFilename(), mpf.getSize());
+            Dimension dim = ImgUtils.imgDimension(mpf.getBytes());
+            image.setWidth(dim.width);
+            image.setHeight(dim.height);
+            image.setContent(mpf.getBytes());
+            imageDao.insert(image);
+            return image.getId();
+        } catch (IOException e) {
+            throw new RollBackException(e);
+        }
+    }
+
     @Override
     public void updateImage(Long id, String writeToken, MultipartFile mpf) throws RollBackException {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
@@ -47,39 +76,6 @@ public class ImageWriteServiceImpl implements ImageWriteService {
             image.setContent(mpf.getBytes());
 
             imageDao.update(image);
-
-        } catch (IOException e) {
-            throw new RollBackException(e);
-        }
-    }
-
-    @Override
-    public void checkImagePermissionByImageIdAndWriteToken(Long id, String writeToken) throws RollBackException {
-        if (id == null) throw new RollBackException("image_id is NULL");
-        if (id < 1) throw new RollBackException("image_id (" + id + ") is less that 1");
-        if (writeToken == null) throw new RollBackException("token is NULL for image id=" + id);
-        if (writeToken.isEmpty()) throw new RollBackException("token is EMPTY for image id=" + id);
-        if (imageDao.countByImageIdAndWriteToken(id, writeToken) <1) throw new RollBackException("no image found with image_id=" + id + " and writeToken=" + writeToken);
-    }
-
-    private String contentType(MultipartFile mpf){
-        return "image/jpg".equals(mpf.getContentType())?"image/jpeg": mpf.getContentType();
-    }
-
-    @Override
-    public Long addImage(String token, MultipartFile mpf) throws RollBackException {
-
-        Token checkedToken = tokenService.checkWriteToken(token);
-        try {
-            Image image = new Image(checkedToken.getId(),contentType(mpf), mpf.getOriginalFilename(), mpf.getSize());
-            Dimension dim = ImgUtils.imgDimension(mpf.getBytes());
-            image.setWidth(dim.width);
-            image.setHeight(dim.height);
-            image.setContent(mpf.getBytes());
-            imageDao.insert(image);
-
-            return image.getId();
-
         } catch (IOException e) {
             throw new RollBackException(e);
         }
@@ -96,8 +92,6 @@ public class ImageWriteServiceImpl implements ImageWriteService {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.avatar(id);
     }
-
-
 
     @Override
     public void setTitle(Long id, String writeToken, String title) throws RollBackException {

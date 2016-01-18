@@ -137,7 +137,33 @@ public class ImageControllerTest {
         ;
 
     }
+    @Test
+    public void testGetAvatar() throws Exception {
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
+        upload2Files(token.getWriteToken());
 
+        mockMvc.perform(get("/image/avatar/" + token.getReadToken()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.avatar").isEmpty())
+        ;
+        Image img= imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        mockMvc.perform(post("/image/avatar/" + img.getId())
+                .param("token", token.getWriteToken()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.status").value("OK"))
+        ;
+        mockMvc.perform(get("/image/avatar/" + token.getReadToken()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.avatar").isNotEmpty())
+                .andExpect(jsonPath("$.avatar.id").value(Integer.valueOf(""+img.getId())))
+        ;
+    }
     @Test
     public void testImageUpload() throws Exception {
 

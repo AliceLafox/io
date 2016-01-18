@@ -43,24 +43,32 @@ public class ImageReadServiceImpl implements ImageReadService {
         return (byte[]) imageDao.getImageContent(id);
     }
 
+//    @Override
+//    public void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException {
+//        try {
+//            map.put("images", new ArrayList<>());
+//            map.put("imagesDeleted", new ArrayList<>());
+//            map.put("avatar", null);
+//
+//            Token token=tokenService.findByReadToken(readToken);
+//
+//            for (Image image : imageDao.findByTokenId(token.getId())) {
+//                    ((List) map.get("images")).add(image);
+//                if (image.isAvatar()) map.put("avatar", image);
+//
+//            }
+//
+//        } catch (Exception e) {
+//            throw new RollBackException(e);
+//        }
+//    }
     @Override
-    public void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException {
-        try {
-            map.put("images", new ArrayList<>());
-            map.put("imagesDeleted", new ArrayList<>());
-            map.put("avatar", null);
-
-            Token token=tokenService.findByReadToken(readToken);
-
-            for (Image image : imageDao.findByTokenId(token.getId())) {
-                    ((List) map.get("images")).add(image);
-                if (image.isAvatar()) map.put("avatar", image);
-
-            }
-
-        } catch (Exception e) {
-            throw new RollBackException(e);
-        }
+    public List<Image> getImagesByReadToken(String readToken) throws RollBackException {
+        return imageDao.findImageListByReadToken(readToken);
+    }
+    @Override
+    public Image getAvatarByReadToken(String readToken) throws RollBackException {
+        return imageDao.findAvatarByReadToken(readToken);
     }
 
     @Override
