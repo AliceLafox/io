@@ -2,7 +2,7 @@ package net.lafox.io.controller;
 
 import net.bull.javamelody.MonitoredWithSpring;
 import net.lafox.io.exceptions.RollBackException;
-import net.lafox.io.service.ImageService;
+import net.lafox.io.service.ImageWriteService;
 import net.lafox.io.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,10 +22,10 @@ import java.util.Map;
 @RequestMapping("image")
 @MonitoredWithSpring
 @CrossOrigin(origins = "*")
-public class ImageController {
+public class ImageWriteController {
 
     @Autowired
-    ImageService imageService;
+    ImageWriteService imageWriteService;
 
     @Autowired
     TokenService tokenService;
@@ -41,7 +41,7 @@ public class ImageController {
         map.put("status", "OK");
         for (MultipartFile mpf : data) {
             try {
-                imageService.updateImage(id,token, mpf);
+                imageWriteService.updateImage(id,token, mpf);
             } catch (RollBackException e) {
                 map.put("status", "ERROR");
                 map.put("details", e.getMessage());
@@ -58,7 +58,7 @@ public class ImageController {
         Map<String, Object> map = new HashMap<>();
         map.put("status", "OK");
             try {
-                imageService.deleteImage(id,token);
+                imageWriteService.deleteImage(id,token);
             } catch (RollBackException e) {
                 map.put("status", "ERROR");
                 map.put("details", e.getMessage());
@@ -74,7 +74,7 @@ public class ImageController {
         Map<String, Object> map = new HashMap<>();
         map.put("status", "OK");
             try {
-                imageService.setAvatar(id,token);
+                imageWriteService.setAvatar(id,token);
             } catch (RollBackException e) {
                 map.put("status", "ERROR");
                 map.put("details", e.getMessage());
@@ -91,7 +91,7 @@ public class ImageController {
         Map<String, Object> map = new HashMap<>();
         map.put("status", "OK");
         try {
-            imageService.setTitle(id, token, title);
+            imageWriteService.setTitle(id, token, title);
         } catch (RollBackException e) {
             map.put("status", "ERROR");
             map.put("details", e.getMessage());
@@ -108,7 +108,7 @@ public class ImageController {
         Map<String, Object> map = new HashMap<>();
         map.put("status", "OK");
         try {
-            imageService.setDescription(id, token, description);
+            imageWriteService.setDescription(id, token, description);
         } catch (RollBackException e) {
             map.put("status", "ERROR");
             map.put("details", e.getMessage());
@@ -130,7 +130,7 @@ public class ImageController {
         map.put("status", "OK");
         for (MultipartFile mpf : data) {
             try {
-                imageService.addImage(token, mpf);
+                imageWriteService.addImage(token, mpf);
             } catch (RollBackException e) {
                 map.put("status", "ERROR");
                 map.put("details", e.getMessage());
@@ -139,25 +139,6 @@ public class ImageController {
         return map;
     }
 
- @RequestMapping(value = "list/{roToken}", method = RequestMethod.GET)
-    public synchronized Map<String, Object> getImages(@PathVariable String roToken) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("status", "OK");
-            try {
-                imageService.getImagesByReadToken(roToken, map);
-            } catch (Exception e) {
-                map.put("status", "ERROR");
-                map.put("details", e.getMessage());
-            }
-        return map;
-    }
 
-    @RequestMapping(value = "test")
-    public Object test(HttpServletRequest request) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("isAlive", "yes");
-        map.put("isAliveBool", true);
-        return map;
-    }
 
 }

@@ -14,17 +14,15 @@ import java.util.Map;
  * Lafox.Net Software Developers Team http://dev.lafox.net
  */
 
-public interface ImageService {
+public interface ImageWriteService {
 
 //    String imagePath(Image image);
 
-    List<Image> getImages(Token token);
+//    List<Image> getImages(Token token);
 
     void checkImagePermissionByImageIdAndWriteToken(Long id, String token) throws RollBackException;
 
-    Image findOne(Long id);
 
-    byte[] getImageContent(Long id);
 
     Long addImage(String writeToken, MultipartFile mpf) throws RollBackException;
 
@@ -34,7 +32,7 @@ public interface ImageService {
 
     void setAvatar(Long id, String writeToken) throws RollBackException;
 
-    void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException;
+//    void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException;
 
     void setTitle(Long id, String writeToken, String title) throws RollBackException;
 

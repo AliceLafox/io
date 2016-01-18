@@ -25,7 +25,7 @@ import java.util.Map;
 @Service
 @MonitoredWithSpring
 @Transactional(rollbackFor = RollBackException.class)
-public class ImageServiceImpl implements ImageService {
+public class ImageWriteServiceImpl implements ImageWriteService {
 
     @Autowired
     ImageDao imageDao;
@@ -36,7 +36,7 @@ public class ImageServiceImpl implements ImageService {
     public void updateImage(Long id, String writeToken, MultipartFile mpf) throws RollBackException {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         try {
-            Image image = findOne(id);
+            Image image = imageDao.findOne(id);
             image.setContentType(contentType(mpf));
             image.setFileName(mpf.getOriginalFilename());
             image.setSize(mpf.getSize());
@@ -54,28 +54,12 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public List<Image> getImages(Token token) {
-        return imageDao.findByTokenId(token.getId());
-    }
-
-    @Override
     public void checkImagePermissionByImageIdAndWriteToken(Long id, String writeToken) throws RollBackException {
         if (id == null) throw new RollBackException("image_id is NULL");
         if (id < 1) throw new RollBackException("image_id (" + id + ") is less that 1");
         if (writeToken == null) throw new RollBackException("token is NULL for image id=" + id);
         if (writeToken.isEmpty()) throw new RollBackException("token is EMPTY for image id=" + id);
         if (imageDao.countByImageIdAndWriteToken(id, writeToken) <1) throw new RollBackException("no image found with image_id=" + id + " and writeToken=" + writeToken);
-    }
-
-    @Override
-    public Image findOne(Long id) {
-        if (id == null || id < 1) return null;
-        return imageDao.findOne(id);
-    }
-
-    @Override
-    public byte[] getImageContent(Long id) {
-        return (byte[]) imageDao.getImageContent(id);
     }
 
     private String contentType(MultipartFile mpf){
@@ -113,25 +97,7 @@ public class ImageServiceImpl implements ImageService {
         imageDao.avatar(id);
     }
 
-    @Override
-    public void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException {
-        try {
-            map.put("images", new ArrayList<>());
-            map.put("imagesDeleted", new ArrayList<>());
-            map.put("avatar", null);
 
-            Token token=tokenService.findByReadToken(readToken);
-
-            for (Image image : imageDao.findByTokenId(token.getId())) {
-                    ((List) map.get("images")).add(image);
-                if (image.isAvatar()) map.put("avatar", image);
-
-            }
-
-        } catch (Exception e) {
-            throw new RollBackException(e);
-        }
-    }
 
     @Override
     public void setTitle(Long id, String writeToken, String title) throws RollBackException {
