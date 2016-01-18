@@ -24,7 +24,7 @@ public class ImgUtils {
             BufferedImage img = ImageIO.read(new File(fileName));
             dim.setSize(img.getWidth(), img.getHeight());
         } catch (IOException e) {
-            ;
+
         }
         return dim;
     }

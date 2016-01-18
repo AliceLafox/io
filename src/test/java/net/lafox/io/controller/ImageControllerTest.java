@@ -3,7 +3,8 @@ package net.lafox.io.controller;
 import net.lafox.io.IoApplication;
 import net.lafox.io.entity.Image;
 import net.lafox.io.entity.Token;
-import net.lafox.io.service.ImageService;
+import net.lafox.io.service.ImageReadService;
+import net.lafox.io.service.ImageWriteService;
 import net.lafox.io.service.TokenService;
 import net.lafox.io.utils.ImgUtils;
 import org.junit.After;
@@ -12,7 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -28,19 +28,21 @@ import org.springframework.web.context.WebApplicationContext;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Random;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
+/**
+ * Created by Alice Lafox <alice@lafox.net> on 18.01.16
+ * Lafox.Net Software Developers Team http://dev.lafox.net
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = IoApplication.class)
 @ActiveProfiles(profiles = {"test"})
 @WebAppConfiguration
 public class ImageControllerTest {
-    @Value("${upload.dir}")
-    private String UPLOAD_DIR;
 
     @Autowired
     WebApplicationContext webApplicationContext;
@@ -52,12 +54,21 @@ public class ImageControllerTest {
     private String ip;
 
 
+    public InputStream getInputStream(String fn){
+        return this.getClass().getClassLoader().getResourceAsStream(fn);
+    }
+    public File getFile(String fn){
+        return new File(this.getClass().getClassLoader().getResource(fn).getFile());
+    }
     @Autowired
     TokenService tokenService;
 
     @Autowired
-    ImageService imageService;
-Random random = new Random();
+    ImageWriteService imageWriteService;
+    @Autowired
+    ImageReadService imageReadService;
+
+    private final Random random = new Random();
 
     @Before
     public void setUp() {
@@ -81,14 +92,14 @@ Random random = new Random();
     public void testGetOneImageBody() throws Exception {
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getWriteToken());
-        Image img = imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
-        byte[] imgContent =imageService.getImageContent(img.getId());
+        Image img = imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        byte[] imgContent = imageReadService.getImageContent(img.getId());
 
 //        "{id:\\d+}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d}.{ext:png|jpg|gif}"
 
         mockMvc.perform(get("/" + img.getId() + "-w100-h100-oo-q50-v222.png"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
+                .andExpect(content().contentType(MediaType.IMAGE_PNG_VALUE))
                 .andExpect(content().bytes(imgContent))
         ;
 
@@ -127,25 +138,35 @@ Random random = new Random();
                 .andExpect(jsonPath("$.images").isNotEmpty())
                 .andDo(MockMvcResultHandlers.print())
         ;
-        Image img=imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
 
+    }
+    @Test
+    public void testGetAvatar() throws Exception {
+        Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
+        upload2Files(token.getWriteToken());
 
-        mockMvc.perform(delete("/image/delete/" + img.getId())
+        mockMvc.perform(get("/image/avatar/" + token.getReadToken()))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.avatar").isEmpty())
+        ;
+        Image img= imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        mockMvc.perform(post("/image/avatar/" + img.getId())
                 .param("token", token.getWriteToken()))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
-
-        mockMvc.perform(get("/image/list/" + token.getReadToken()))
+        mockMvc.perform(get("/image/avatar/" + token.getReadToken()))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.imagesDeleted").isNotEmpty())
-                .andDo(MockMvcResultHandlers.print())
+                .andExpect(jsonPath("$.avatar").isNotEmpty())
+                .andExpect(jsonPath("$.avatar.id").value(Integer.valueOf("" + img.getId())))
         ;
-
     }
-
     @Test
     public void testImageUpload() throws Exception {
 
@@ -160,10 +181,10 @@ Random random = new Random();
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getWriteToken());
 
-        Image img=imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        Image img= imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
 
-        File file3=new File(UPLOAD_DIR + "/testImage3.jpg");
-        MockMultipartFile image3 = new MockMultipartFile("data", "testImage3.jpg", "image/jpg", new FileInputStream(file3));
+        File file3=getFile("testImage3.png");
+        MockMultipartFile image3 = new MockMultipartFile("data", "testImage3.png", "image/png", new FileInputStream(file3));
 
         Thread.sleep(100);
 
@@ -174,7 +195,8 @@ Random random = new Random();
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageWriteService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageReadService.findOne(img.getId());
 
         Assert.assertEquals(img.getVersion()+1,imgNew.getVersion());
         Assert.assertTrue(img.getModified().compareTo(imgNew.getModified()) == -1);
@@ -184,8 +206,8 @@ Random random = new Random();
     }
 
     private void upload2Files(String rwToken) throws Exception {
-        MockMultipartFile image1 = new MockMultipartFile("data", "testImage1.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage1.jpg"));
-        MockMultipartFile image2 = new MockMultipartFile("data", "testImage2.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage2.jpg"));
+        MockMultipartFile image1 = new MockMultipartFile("data", "testImage1.png", "image/png", getInputStream("testImage1.png"));
+        MockMultipartFile image2 = new MockMultipartFile("data", "testImage2.png", "image/png", getInputStream("testImage2.png"));
 
         mockMvc.perform(MockMvcRequestBuilders.fileUpload("/image/upload")
                 .file(image1)
@@ -202,7 +224,7 @@ Random random = new Random();
     public void testImageDelete() throws Exception {
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getWriteToken());
-        Image img=imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        Image img= imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(delete("/image/delete/" + img.getId())
                 .param("token", token.getWriteToken()))
@@ -211,10 +233,9 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
-
-        Assert.assertTrue(img.isActive());
-        Assert.assertFalse(imgNew.isActive());
+        Image imgNew = imageReadService.findOne(img.getId());
+        Assert.assertNull(imgNew);
+        Assert.assertNotNull(img);
     }
 
 
@@ -222,7 +243,7 @@ Random random = new Random();
     public void testSetAvatarImage() throws Exception {
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getWriteToken());
-        Image img=imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        Image img= imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(post("/image/avatar/" + img.getId())
                 .param("token", token.getWriteToken()))
@@ -231,7 +252,8 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageWriteService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageReadService.findOne(img.getId());
 
         Assert.assertFalse(img.isAvatar());
         Assert.assertTrue(imgNew.isAvatar());
@@ -244,7 +266,7 @@ Random random = new Random();
         String title="this is the title of image";
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getWriteToken());
-        Image img=imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        Image img= imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(post("/image/title/" + img.getId())
                 .param("token", token.getWriteToken())
@@ -255,7 +277,8 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageWriteService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageReadService.findOne(img.getId());
 
         Assert.assertNull(img.getTitle());
         Assert.assertTrue(imgNew.getTitle().equals(title));
@@ -268,7 +291,7 @@ Random random = new Random();
         String description="this is the description of image";
         Token token = tokenService.addToken(siteName, ownerName, ++ownerId, ip);
         upload2Files(token.getWriteToken());
-        Image img=imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
+        Image img= imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
 
         mockMvc.perform(post("/image/description/" + img.getId())
                 .param("token", token.getWriteToken())
@@ -279,11 +302,11 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageWriteService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageReadService.findOne(img.getId());
 
         Assert.assertNull(img.getDescription());
         Assert.assertTrue(imgNew.getDescription().equals(description));
-
 
     }
 }

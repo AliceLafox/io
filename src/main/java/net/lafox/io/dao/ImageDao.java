@@ -13,7 +13,22 @@ import java.util.List;
 
 
 public interface ImageDao {
-    String SELECT_FIELDS=" id, sort_index, version, width, height, created, modified, content_type, file_name, title, description, size, active, avatar, token_id ";
+    String SELECT_FIELDS="" +
+            " i.id," +
+            " sort_index," +
+            " version," +
+            " width," +
+            " height," +
+            " i.created," +
+            " modified," +
+            " content_type," +
+            " file_name," +
+            " title," +
+            " description," +
+            " size," +
+            " avatar," +
+            " token_id ";
+
     String UPDATE_FIELDS=" " +
             "version = version+1, " +
             "modified = NOW(), " +
@@ -23,15 +38,30 @@ public interface ImageDao {
             "file_name = #{fileName}, " +
             "size = #{size}, " +
             "content = #{content}";
+
     String INSERT_FIELDS=" (width, height, content_type, file_name, size, token_id, content) " +
             "VALUES (#{width}, #{height}, #{contentType}, #{fileName}, #{size}, #{tokenId}, #{content}) ";
 
-    @Select("SELECT " + SELECT_FIELDS + " FROM image WHERE token_id=#{tokenId} order by sort_index ASC")
+    @Select("SELECT " + SELECT_FIELDS + " FROM image i WHERE token_id=#{tokenId} order by sort_index ASC")
     List<Image> findByTokenId(@Param("tokenId") Long tokenId);
 
+    @Select("SELECT " + SELECT_FIELDS + " FROM image i " +
+            " LEFT JOIN token t ON(i.token_id=t.id) " +
+            " WHERE t.read_token=#{readToken} order by sort_index ASC")
+    List<Image> findImageListByReadToken(@Param("readToken") String readToken);
 
-    @Select("SELECT " + SELECT_FIELDS + "FROM image WHERE id=#{id}")
+    @Select("SELECT " + SELECT_FIELDS + " FROM image i " +
+            " LEFT JOIN token t ON(i.token_id=t.id) " +
+            " WHERE t.read_token=#{readToken} AND avatar=true limit 1")
+    Image findAvatarByReadToken(@Param("readToken") String readToken);
+
+    @Select("SELECT " + SELECT_FIELDS + "FROM image i WHERE id=#{id}")
     Image findOne(@Param("id")Long id);
+
+    @Select("SELECT count(*) FROM image i " +
+            " LEFT JOIN token t ON(i.token_id=t.id) " +
+            " WHERE i.id=#{id} AND t.write_token=#{writeToken}")
+    Long countByImageIdAndWriteToken(@Param("id")Long id, @Param("writeToken")String writeToken);
 
     @Select("SELECT content FROM image WHERE id=#{id}")
     Object getImageContent(@Param("id")Long id);
@@ -43,7 +73,7 @@ public interface ImageDao {
     @Options(useGeneratedKeys = true, keyProperty = "id", flushCache=true)
     void insert(Image image);
 
-    @Update("UPDATE image SET active = false WHERE id=#{id}")
+    @Delete("DELETE FROM image WHERE id=#{id}")
     void delete(@Param("id")Long id);
 
     @Update("select setAvatar(#{id})")
@@ -55,6 +85,12 @@ public interface ImageDao {
     @Update("UPDATE image SET description = #{description} WHERE id=#{id}")
     void description(@Param("id")Long id, @Param("description") String description);
 
-
-
+    @Update("select sort_index_plus(#{id})")
+    void sortIndexPlus(@Param("id")Long id);
+    @Update("select sort_index_minus(#{id})")
+    void sortIndexMinus(@Param("id")Long id);
+    @Update("select sort_index_to_first(#{id})")
+    void sortIndexToFirst(@Param("id")Long id);
+    @Update("select sort_index_to_last(#{id})")
+    void sortIndexToLast(@Param("id")Long id);
 }

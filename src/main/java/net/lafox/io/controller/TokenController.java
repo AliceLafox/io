@@ -1,5 +1,6 @@
 package net.lafox.io.controller;
 
+import net.bull.javamelody.MonitoredWithSpring;
 import net.lafox.io.entity.Token;
 import net.lafox.io.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Map;
  */
 
 @RestController
+@MonitoredWithSpring
 @RequestMapping("api/token")
 public class TokenController {
 

@@ -1,8 +1,9 @@
 package net.lafox.io.controller;
 
+import net.bull.javamelody.MonitoredWithSpring;
 import net.coobird.thumbnailator.Thumbnails;
 import net.lafox.io.entity.Image;
-import net.lafox.io.service.ImageService;
+import net.lafox.io.service.ImageReadService;
 import net.lafox.io.utils.ImgProcessing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,11 +29,12 @@ import java.util.Map;
  * Lafox.Net Software developers Team http://dev.lafox.net
  */
 @Controller
+@MonitoredWithSpring
 @RequestMapping("")
 public class RootController {
 
     @Autowired
-    ImageService imageService;
+    ImageReadService imageReadService;
 
     private static final String ETAG = "\"%d-w%d-h%d-o%s-v%d-q%d.%s\"";
     private static final long EXP = ZonedDateTime.now().plusYears(1).toInstant().toEpochMilli();
@@ -55,16 +57,15 @@ public class RootController {
     ) throws IOException {
         HttpStatus httpStatus = HttpStatus.OK;
 
-        Image image = imageService.getImage(id);
+        Image image = imageReadService.findOne(id);
         byte[] file;
 
         if (image == null) {//to return 404.png
             image = new Image();
             httpStatus = HttpStatus.NOT_FOUND;
-//            file = Files.readAllBytes(new File("classpath:404.png").toPath());
             file = Files.readAllBytes(new File(this.getClass().getClassLoader().getResource("404.png").getFile()).toPath());
         } else {
-            file = imageService.getImageContent(id);
+            file = imageReadService.getImageContent(id);
         }
 
         final HttpHeaders headers = new HttpHeaders();

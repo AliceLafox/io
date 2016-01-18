@@ -1,6 +1,7 @@
 package net.lafox.io.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -28,10 +29,12 @@ public class Image implements Serializable {
     private String description;
     private Long size;
 
-    private boolean active;
+    @JsonIgnore
     private boolean avatar;
 
+    @JsonIgnore
     private Long tokenId;
+    @JsonIgnore
     private byte[] content;
 
 
@@ -47,12 +50,6 @@ public class Image implements Serializable {
     public Image() {
     }
 
-    public ImageDto asDto(){
-        ImageDto imageDto=new ImageDto();
-        BeanUtils.copyProperties(this, imageDto);
-        imageDto.setV(version);
-        return imageDto;
-    }
 
     public byte[] getContent() {
         return content;
@@ -68,14 +65,6 @@ public class Image implements Serializable {
 
     public void setTokenId(Long tokenId) {
         this.tokenId = tokenId;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     public boolean isAvatar() {

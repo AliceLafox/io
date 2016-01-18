@@ -1,5 +1,6 @@
 package net.lafox.io.service;
 
+import net.bull.javamelody.MonitoredWithSpring;
 import net.lafox.io.dao.TokenDao;
 import net.lafox.io.entity.Token;
 import net.lafox.io.exceptions.RollBackException;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 
 @Service
+@MonitoredWithSpring
 @Transactional(rollbackFor = RollBackException.class)
 public class TokenServiceImpl implements TokenService {
 
@@ -47,7 +49,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Token checkWriteToken(String writeToken) throws RollBackException{
         Token t=tokenDao.findByWriteToken(writeToken);
-        if (t == null) throw new RollBackException("token not found");
+        if (t == null) throw new RollBackException("writeToken not found "+writeToken);
         return t;
     }
 
@@ -59,7 +61,7 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public Token checkReadToken(String readToken) throws RollBackException{
         Token t=tokenDao.findByReadToken(readToken);
-        if (t == null) throw new RollBackException("token not found");
+        if (t == null) throw new RollBackException("readToken not found "+readToken);
         return t;
     }
 
@@ -71,5 +73,5 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public void cleanupAfterTests(){
         tokenDao.cleanupAfterTests();
-    };
+    }
 }
