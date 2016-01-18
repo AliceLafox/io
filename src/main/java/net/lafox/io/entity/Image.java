@@ -30,9 +30,6 @@ public class Image implements Serializable {
     private Long size;
 
     @JsonIgnore
-    private boolean active;
-
-    @JsonIgnore
     private boolean avatar;
 
     @JsonIgnore
@@ -68,14 +65,6 @@ public class Image implements Serializable {
 
     public void setTokenId(Long tokenId) {
         this.tokenId = tokenId;
-    }
-
-    public boolean isActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
     }
 
     public boolean isAvatar() {

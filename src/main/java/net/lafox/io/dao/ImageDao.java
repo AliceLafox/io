@@ -26,7 +26,6 @@ public interface ImageDao {
             " title," +
             " description," +
             " size," +
-            " active," +
             " avatar," +
             " token_id ";
 
@@ -65,7 +64,7 @@ public interface ImageDao {
     @Options(useGeneratedKeys = true, keyProperty = "id", flushCache=true)
     void insert(Image image);
 
-    @Update("UPDATE image SET active = false WHERE id=#{id}")
+    @Delete("DELETE FROM image WHERE id=#{id}")
     void delete(@Param("id")Long id);
 
     @Update("select setAvatar(#{id})")

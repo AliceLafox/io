@@ -132,22 +132,6 @@ public class ImageControllerTest {
                 .andExpect(jsonPath("$.images").isNotEmpty())
                 .andDo(MockMvcResultHandlers.print())
         ;
-        Image img=imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
-
-
-        mockMvc.perform(delete("/image/delete/" + img.getId())
-                .param("token", token.getWriteToken()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.status").value("OK"))
-        ;
-
-        mockMvc.perform(get("/image/list/" + token.getReadToken()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.imagesDeleted").isNotEmpty())
-                .andDo(MockMvcResultHandlers.print())
-        ;
 
     }
 
@@ -217,11 +201,9 @@ public class ImageControllerTest {
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        imageService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
         Image imgNew = imageService.findOne(img.getId());
-
-        Assert.assertTrue(img.isActive());
-        Assert.assertFalse(imgNew.isActive());
+        Assert.assertNull(imgNew);
+        Assert.assertNotNull(img);
     }
 
 

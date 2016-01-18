@@ -123,11 +123,7 @@ public class ImageServiceImpl implements ImageService {
             Token token=tokenService.findByReadToken(readToken);
 
             for (Image image : imageDao.findByTokenId(token.getId())) {
-                if (image.isActive()) {
                     ((List) map.get("images")).add(image);
-                } else {
-                    ((List) map.get("imagesDeleted")).add(image);
-                }
                 if (image.isAvatar()) map.put("avatar", image);
 
             }
