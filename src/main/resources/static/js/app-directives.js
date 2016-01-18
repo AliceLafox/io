@@ -27,7 +27,7 @@ angular.module('science')
         return {
             restrict: 'E',
             scope: {image: '='},
-            template: '<img width=100 height="100" ng-src="http://localhost:8081/{{image.id}}-w100-h100-oc-q50-v{{image.v}}.jpg"/>'
+            template: '<img width=100 height="100" ng-src="http://localhost:8081/{{image.id}}-w100-h100-oc-q50-v{{image.version}}.jpg"/>'
         };
     })
 
