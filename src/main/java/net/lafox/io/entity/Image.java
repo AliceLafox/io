@@ -53,12 +53,6 @@ public class Image implements Serializable {
     public Image() {
     }
 
-    public ImageDto asDto(){
-        ImageDto imageDto=new ImageDto();
-        BeanUtils.copyProperties(this, imageDto);
-        imageDto.setV(version);
-        return imageDto;
-    }
 
     public byte[] getContent() {
         return content;
