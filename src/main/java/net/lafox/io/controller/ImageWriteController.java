@@ -8,13 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Alice Lafox <alice@lafox.net> on 23.12.15
+ * Created by Alice Lafox <alice@lafox.net> on 18.01.16
  * Lafox.Net Software Developers Team http://dev.lafox.net
  */
 

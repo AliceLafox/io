@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by Alice Lafox <alice@lafox.net> on 23.12.15
+ * Created by Alice Lafox <alice@lafox.net> on 18.01.16
  * Lafox.Net Software Developers Team http://dev.lafox.net
  */
 
@@ -103,6 +103,30 @@ public class ImageWriteServiceImpl implements ImageWriteService {
     public void setDescription(Long id, String rwToken, String description) throws RollBackException {
         checkImagePermissionByImageIdAndWriteToken(id, rwToken);
         imageDao.description(id, description);
+    }
+
+    @Override
+    public void sortIndexPlus(Long id, String writeToken) throws RollBackException  {
+        checkImagePermissionByImageIdAndWriteToken(id, writeToken);
+        imageDao.sortIndexPlus(id);
+    }
+
+    @Override
+    public void sortIndexMinus(Long id, String writeToken) throws RollBackException  {
+        checkImagePermissionByImageIdAndWriteToken(id, writeToken);
+        imageDao.sortIndexMinus(id);
+    }
+
+    @Override
+    public void sortIndexToFirst(Long id, String writeToken) throws RollBackException  {
+        checkImagePermissionByImageIdAndWriteToken(id, writeToken);
+        imageDao.sortIndexToFirst(id);
+    }
+
+    @Override
+    public void sortIndexToLast(Long id, String writeToken) throws RollBackException  {
+        checkImagePermissionByImageIdAndWriteToken(id, writeToken);
+        imageDao.sortIndexToLast(id);
     }
 
 }

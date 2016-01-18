@@ -34,7 +34,10 @@ import java.util.Random;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
+/**
+ * Created by Alice Lafox <alice@lafox.net> on 18.01.16
+ * Lafox.Net Software Developers Team http://dev.lafox.net
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = IoApplication.class)
 @ActiveProfiles(profiles = {"test"})
@@ -161,7 +164,7 @@ public class ImageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.avatar").isNotEmpty())
-                .andExpect(jsonPath("$.avatar.id").value(Integer.valueOf(""+img.getId())))
+                .andExpect(jsonPath("$.avatar.id").value(Integer.valueOf("" + img.getId())))
         ;
     }
     @Test
@@ -304,7 +307,6 @@ public class ImageControllerTest {
 
         Assert.assertNull(img.getDescription());
         Assert.assertTrue(imgNew.getDescription().equals(description));
-
 
     }
 }

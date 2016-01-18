@@ -85,6 +85,12 @@ public interface ImageDao {
     @Update("UPDATE image SET description = #{description} WHERE id=#{id}")
     void description(@Param("id")Long id, @Param("description") String description);
 
-
-
+    @Update("select sort_index_plus(#{id})")
+    void sortIndexPlus(@Param("id")Long id);
+    @Update("select sort_index_minus(#{id})")
+    void sortIndexMinus(@Param("id")Long id);
+    @Update("select sort_index_to_first(#{id})")
+    void sortIndexToFirst(@Param("id")Long id);
+    @Update("select sort_index_to_last(#{id})")
+    void sortIndexToLast(@Param("id")Long id);
 }
