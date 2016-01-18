@@ -18,7 +18,6 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Random;
 
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -32,7 +31,7 @@ public class TokenControllerTests {
     WebApplicationContext webApplicationContext;
 
     private MockMvc mockMvc;
-    Random random = new Random();
+    private final Random random = new Random();
 
     @Autowired
     TokenService tokenService;

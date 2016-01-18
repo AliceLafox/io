@@ -13,7 +13,23 @@ import java.util.List;
 
 
 public interface ImageDao {
-    String SELECT_FIELDS=" id, sort_index, version, width, height, created, modified, content_type, file_name, title, description, size, active, avatar, token_id ";
+    String SELECT_FIELDS="" +
+            " id," +
+            " sort_index," +
+            " version," +
+            " width," +
+            " height," +
+            " created," +
+            " modified," +
+            " content_type," +
+            " file_name," +
+            " title," +
+            " description," +
+            " size," +
+            " active," +
+            " avatar," +
+            " token_id ";
+
     String UPDATE_FIELDS=" " +
             "version = version+1, " +
             "modified = NOW(), " +
@@ -23,6 +39,7 @@ public interface ImageDao {
             "file_name = #{fileName}, " +
             "size = #{size}, " +
             "content = #{content}";
+
     String INSERT_FIELDS=" (width, height, content_type, file_name, size, token_id, content) " +
             "VALUES (#{width}, #{height}, #{contentType}, #{fileName}, #{size}, #{tokenId}, #{content}) ";
 
@@ -32,6 +49,11 @@ public interface ImageDao {
 
     @Select("SELECT " + SELECT_FIELDS + "FROM image WHERE id=#{id}")
     Image findOne(@Param("id")Long id);
+
+    @Select("SELECT count(*) FROM image i " +
+            " LEFT JOIN token t ON(i.token_id=t.id) " +
+            " WHERE i.id=#{id} AND t.write_token=#{writeToken}")
+    Long countByImageIdAndWriteToken(@Param("id")Long id, @Param("writeToken")String writeToken);
 
     @Select("SELECT content FROM image WHERE id=#{id}")
     Object getImageContent(@Param("id")Long id);

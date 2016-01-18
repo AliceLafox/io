@@ -34,10 +34,9 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void updateImage(Long id, String writeToken, MultipartFile mpf) throws RollBackException {
-        tokenService.checkWriteToken(writeToken);
-
+        checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         try {
-            Image image = this.getImageCheckByWriteToken(id, writeToken);
+            Image image = findOne(id);
             image.setContentType(contentType(mpf));
             image.setFileName(mpf.getOriginalFilename());
             image.setSize(mpf.getSize());
@@ -60,23 +59,16 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Image getImageCheckByWriteToken(Long id, String writeToken) throws RollBackException {
+    public void checkImagePermissionByImageIdAndWriteToken(Long id, String writeToken) throws RollBackException {
+        if (id == null) throw new RollBackException("image_id is NULL");
+        if (id < 1) throw new RollBackException("image_id (" + id + ") is less that 1");
         if (writeToken == null) throw new RollBackException("token is NULL for image id=" + id);
         if (writeToken.isEmpty()) throw new RollBackException("token is EMPTY for image id=" + id);
-
-        Image image = imageDao.findOne(id);
-
-        if (image == null) throw new RollBackException("no image found with id="+id);
-
-        Token token = tokenService.findByTokenId(image.getTokenId());
-
-        if (!writeToken.equals(token.getWriteToken())) throw new RollBackException("incorrect token: " + writeToken + " for image id=" + id);
-
-        return image;
+        if (imageDao.countByImageIdAndWriteToken(id, writeToken) <1) throw new RollBackException("no image found with image_id=" + id + " and writeToken=" + writeToken);
     }
 
     @Override
-    public Image getImage(Long id) {
+    public Image findOne(Long id) {
         if (id == null || id < 1) return null;
         return imageDao.findOne(id);
     }
@@ -87,7 +79,6 @@ public class ImageServiceImpl implements ImageService {
     }
 
     private String contentType(MultipartFile mpf){
-
         return "image/jpg".equals(mpf.getContentType())?"image/jpeg": mpf.getContentType();
     }
 
@@ -112,22 +103,18 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public void deleteImage(Long id, String writeToken) throws RollBackException {
-        Image image= getImageCheckByWriteToken(id, writeToken);
-        imageDao.delete(image.getId());
+        checkImagePermissionByImageIdAndWriteToken(id, writeToken);
+        imageDao.delete(id);
     }
 
     @Override
     public void setAvatar(Long id, String writeToken) throws RollBackException {
-
-        if (id==null) throw new RollBackException("id can not be null");
-        tokenService.checkWriteToken(writeToken);
-
+        checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.avatar(id);
     }
 
     @Override
     public void getImagesByReadToken(String readToken, Map<String, Object> map) throws RollBackException {
-
         try {
             map.put("images", new ArrayList<>());
             map.put("imagesDeleted", new ArrayList<>());
@@ -148,26 +135,17 @@ public class ImageServiceImpl implements ImageService {
         } catch (Exception e) {
             throw new RollBackException(e);
         }
-
     }
 
     @Override
     public void setTitle(Long id, String writeToken, String title) throws RollBackException {
-        if (title == null || title.isEmpty()) return;
-        if (id == null) throw new RollBackException("id can not be null");
-        tokenService.checkWriteToken(writeToken);
-
-        getImageCheckByWriteToken(id, writeToken);
+        checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.title(id, title);
     }
 
     @Override
     public void setDescription(Long id, String rwToken, String description) throws RollBackException {
-        if (description == null || description.isEmpty()) return;
-        if (id == null) throw new RollBackException("id can not be null");
-        tokenService.checkWriteToken(rwToken);
-
-        getImageCheckByWriteToken(id, rwToken);
+        checkImagePermissionByImageIdAndWriteToken(id, rwToken);
         imageDao.description(id, description);
     }
 

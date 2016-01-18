@@ -61,7 +61,8 @@ public class ImageControllerTest {
 
     @Autowired
     ImageService imageService;
-Random random = new Random();
+
+    private final Random random = new Random();
 
     @Before
     public void setUp() {
@@ -178,7 +179,8 @@ Random random = new Random();
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageService.findOne(img.getId());
 
         Assert.assertEquals(img.getVersion()+1,imgNew.getVersion());
         Assert.assertTrue(img.getModified().compareTo(imgNew.getModified()) == -1);
@@ -215,7 +217,8 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageService.findOne(img.getId());
 
         Assert.assertTrue(img.isActive());
         Assert.assertFalse(imgNew.isActive());
@@ -235,7 +238,8 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageService.findOne(img.getId());
 
         Assert.assertFalse(img.isAvatar());
         Assert.assertTrue(imgNew.isAvatar());
@@ -259,7 +263,8 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageService.findOne(img.getId());
 
         Assert.assertNull(img.getTitle());
         Assert.assertTrue(imgNew.getTitle().equals(title));
@@ -283,7 +288,8 @@ Random random = new Random();
                 .andExpect(jsonPath("$.status").value("OK"))
         ;
 
-        Image imgNew=imageService.getImageCheckByWriteToken(img.getId(), token.getWriteToken());
+        imageService.checkImagePermissionByImageIdAndWriteToken(img.getId(), token.getWriteToken());
+        Image imgNew = imageService.findOne(img.getId());
 
         Assert.assertNull(img.getDescription());
         Assert.assertTrue(imgNew.getDescription().equals(description));

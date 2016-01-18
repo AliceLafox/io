@@ -57,7 +57,7 @@ public class RootController {
     ) throws IOException {
         HttpStatus httpStatus = HttpStatus.OK;
 
-        Image image = imageService.getImage(id);
+        Image image = imageService.findOne(id);
         byte[] file;
 
         if (image == null) {//to return 404.png

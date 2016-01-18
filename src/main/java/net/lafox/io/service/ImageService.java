@@ -20,9 +20,9 @@ public interface ImageService {
 
     List<Image> getImages(Token token);
 
-    Image getImageCheckByWriteToken(Long id, String token) throws RollBackException;
+    void checkImagePermissionByImageIdAndWriteToken(Long id, String token) throws RollBackException;
 
-    Image getImage(Long id);
+    Image findOne(Long id);
 
     byte[] getImageContent(Long id);
 
