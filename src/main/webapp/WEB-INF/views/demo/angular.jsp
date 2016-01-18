@@ -17,6 +17,7 @@
 
   <script src="/js/ng-file-upload.min.js"></script>
   <script src="/js/app.js"></script>
+  <script src="/js/app-directives.js"></script>
   <script src="/js/image-controller.js"></script>
 
   <meta charset="UTF-8">
@@ -26,14 +27,16 @@
 </head>
 <body ng-app="science">
 <div class="page-header">
-  <h1>This is Image REST project
+  <h1>Image REST project
     <small>{{"AngularJS Demo HTML page" | uppercase }}</small>
   </h1>
-  ${message}
+<h3-text text='${message}'></h3-text>
 </div>
 
-<image-edit-gallery></image-edit-gallery>
 
+
+<token-register></token-register>
+<image-edit-gallery></image-edit-gallery>
 <image-uploader></image-uploader>
 
 </body>

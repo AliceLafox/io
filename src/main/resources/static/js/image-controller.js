@@ -3,45 +3,54 @@
  * Lafox.Net Software developers Team http://dev.lafox.net
  */
 
-var wUrl = 'http://localhost:8081/image/';
-
 angular.module('science')
-    .controller('ImageController', ['$http', '$scope', 'Upload', function ($http, $scope, Upload) {
+    .controller('ImageController', ['$http', '$scope', 'Upload', 'serviceUrl', 'initToken', function ($http, $scope, Upload, serviceUrl, initToken) {
+        $scope.token = initToken;
 
-    $scope.loadImages = function (token) {
-        $http.get(wUrl + 'list/' + token).success(function (data) {
-            $scope.images = data.images;
-        });
-
-    };
-
-    $scope.loadImages('readToken');
-
-    $scope.deleteImage = function (imageId, token) {
-        $http.delete(wUrl + 'delete/' + imageId, {params: {token: token}})
-            .success(function (data) {
-                $scope.loadImages('readToken');
+        $scope.getToken = function () {
+            $http({
+                method: 'POST',
+                url: serviceUrl+'/api/token/add',
+                params: $scope.token
+            }).success(function (data) {
+                $scope.token.readToken = data.readToken;
+                $scope.token.writeToken = data.writeToken;
+                $scope.loadImages();
             });
-    };
 
-    $scope.uploadFiles = function (files, token) {
-        if (files && files.length) {
-            for (var i = 0; i < files.length; i++) {
-                Upload.upload({
-                    url: wUrl + 'upload',
-                    data: {data: files[i], token: token}
-                }).success(function () {
-                    $scope.loadImages('readToken');
-                }).then(function (resp) {
-                    console.log('Success ' + resp.config.data.data.name + ' uploaded. Response: ' + resp.data);
+        };
+
+        $scope.loadImages = function () {
+            $http.get(serviceUrl + '/image/list/' + $scope.token.readToken).success(function (data) {
+                $scope.images = data.images;
+            });
+        };
+
+        $scope.deleteImage = function (imageId) {
+            $http.delete(serviceUrl + '/image/delete/' + imageId, {params: {token: $scope.token.writeToken}})
+                .success(function (data) {
+                    $scope.loadImages();
                 });
-            }
-        }
-    };
+        };
 
-    $scope.submit = function (token) {
-        $scope.uploadFiles($scope.files, token);
-        $scope.files={};
-    };
+        $scope.uploadFiles = function (files) {
+            if (files && files.length) {
+                for (var i = 0; i < files.length; i++) {
+                    Upload.upload({
+                        url: serviceUrl + '/image/upload',
+                        data: {data: files[i], token: $scope.token.writeToken}
+                    }).success(function () {
+                        $scope.loadImages();
+                    }).then(function (resp) {
+                        console.log('Success ' + resp.config.data.data.name + ' uploaded. Response: ' + resp.data);
+                    });
+                }
+            }
+        };
+
+        this.submit = function () {
+            $scope.uploadFiles($scope.files);
+            $scope.files = {};
+        };
 
 }]);

@@ -1,0 +1,13 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        <form name="tokenRegisterForm" novalidate ng-submit="tokenRegisterForm.$valid && getToken()">
+            <input type="text" ng-model="token.siteName"  placeholder="angular-site"/>
+            <input type="text" ng-model="token.ownerName" placeholder="item"/>
+            <input type="text" ng-model="token.ownerId" placeholder="1001"/>
+
+            <button type="submit" class="btn">GET TOKEN</button> {{token.siteName}}, {{token.ownerName}}, {{token.ownerId}} <strong>{{token.readToken}}</strong>
+        </form>
+
+    </div>
+</div>

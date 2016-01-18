@@ -14,7 +14,7 @@ public class DemoController {
 
 @RequestMapping("angularJS")
     public String show(Model model) {
-        model.addAttribute("message", "Hello there!");
+        model.addAttribute("message", "Hello from Spring Demo Controller!");
         model.addAttribute("rToken", "ro-token");
         model.addAttribute("wToken", "rw-token");
         return "demo/angular";
