@@ -135,11 +135,11 @@ public class ImageServiceImpl implements ImageService {
 
             for (Image image : imageDao.findByTokenId(token.getId())) {
                 if (image.isActive()) {
-                    ((List) map.get("images")).add(image.asDto());
+                    ((List) map.get("images")).add(image);
                 } else {
-                    ((List) map.get("imagesDeleted")).add(image.asDto());
+                    ((List) map.get("imagesDeleted")).add(image);
                 }
-                if (image.isAvatar()) map.put("avatar", image.asDto());
+                if (image.isAvatar()) map.put("avatar", image);
 
             }
 

@@ -1,6 +1,7 @@
 package net.lafox.io.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -28,10 +29,15 @@ public class Image implements Serializable {
     private String description;
     private Long size;
 
+    @JsonIgnore
     private boolean active;
+
+    @JsonIgnore
     private boolean avatar;
 
+    @JsonIgnore
     private Long tokenId;
+    @JsonIgnore
     private byte[] content;
 
 
