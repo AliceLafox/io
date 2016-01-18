@@ -12,7 +12,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -28,6 +27,7 @@ import org.springframework.web.context.WebApplicationContext;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Random;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -39,8 +39,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 @ActiveProfiles(profiles = {"test"})
 @WebAppConfiguration
 public class ImageControllerTest {
-    @Value("${upload.dir}")
-    private String UPLOAD_DIR;
 
     @Autowired
     WebApplicationContext webApplicationContext;
@@ -52,6 +50,12 @@ public class ImageControllerTest {
     private String ip;
 
 
+    public InputStream getInputStream(String fn){
+        return this.getClass().getClassLoader().getResourceAsStream(fn);
+    }
+    public File getFile(String fn){
+        return new File(this.getClass().getClassLoader().getResource(fn).getFile());
+    }
     @Autowired
     TokenService tokenService;
 
@@ -88,7 +92,7 @@ Random random = new Random();
 
         mockMvc.perform(get("/" + img.getId() + "-w100-h100-oo-q50-v222.png"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.IMAGE_JPEG_VALUE))
+                .andExpect(content().contentType(MediaType.IMAGE_PNG_VALUE))
                 .andExpect(content().bytes(imgContent))
         ;
 
@@ -162,8 +166,8 @@ Random random = new Random();
 
         Image img=imageService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
 
-        File file3=new File(UPLOAD_DIR + "/testImage3.jpg");
-        MockMultipartFile image3 = new MockMultipartFile("data", "testImage3.jpg", "image/jpg", new FileInputStream(file3));
+        File file3=getFile("testImage3.png");
+        MockMultipartFile image3 = new MockMultipartFile("data", "testImage3.png", "image/png", new FileInputStream(file3));
 
         Thread.sleep(100);
 
@@ -184,8 +188,8 @@ Random random = new Random();
     }
 
     private void upload2Files(String rwToken) throws Exception {
-        MockMultipartFile image1 = new MockMultipartFile("data", "testImage1.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage1.jpg"));
-        MockMultipartFile image2 = new MockMultipartFile("data", "testImage2.jpg", "image/jpg", new FileInputStream(UPLOAD_DIR + "/testImage2.jpg"));
+        MockMultipartFile image1 = new MockMultipartFile("data", "testImage1.png", "image/png", getInputStream("testImage1.png"));
+        MockMultipartFile image2 = new MockMultipartFile("data", "testImage2.png", "image/png", getInputStream("testImage2.png"));
 
         mockMvc.perform(MockMvcRequestBuilders.fileUpload("/image/upload")
                 .file(image1)
