@@ -16,22 +16,22 @@ import java.util.Map;
 
 public interface ImageWriteService {
 
-    void checkImagePermissionByImageIdAndWriteToken(Long id, String token) throws RollBackException;
+    void checkImagePermissionByImageIdAndWriteToken(String id, String token) throws RollBackException;
 
-    Long addImage(String writeToken, MultipartFile mpf) throws RollBackException;
+    String addImage(String writeToken, MultipartFile mpf) throws RollBackException;
 
-    void updateImage(Long id, String writeToken, MultipartFile mpf) throws RollBackException;
+    void updateImage(String id, String writeToken, MultipartFile mpf) throws RollBackException;
 
-    void deleteImage(Long id, String writeToken) throws RollBackException;
+    void deleteImage(String id, String writeToken) throws RollBackException;
 
-    void setAvatar(Long id, String writeToken) throws RollBackException;
+    void setAvatar(String id, String writeToken) throws RollBackException;
 
-    void setTitle(Long id, String writeToken, String title) throws RollBackException;
+    void setTitle(String id, String writeToken, String title) throws RollBackException;
 
-    void setDescription(Long id, String writeToken, String description) throws RollBackException;
+    void setDescription(String id, String writeToken, String description) throws RollBackException;
 
-    void sortIndexPlus(Long id, String writeToken) throws RollBackException ;
-    void sortIndexMinus(Long id, String writeToken) throws RollBackException ;
-    void sortIndexToFirst(Long id, String writeToken) throws RollBackException ;
-    void sortIndexToLast(Long id, String writeToken) throws RollBackException ;
+    void sortIndexPlus(String id, String writeToken) throws RollBackException ;
+    void sortIndexMinus(String id, String writeToken) throws RollBackException ;
+    void sortIndexToFirst(String id, String writeToken) throws RollBackException ;
+    void sortIndexToLast(String id, String writeToken) throws RollBackException ;
 }

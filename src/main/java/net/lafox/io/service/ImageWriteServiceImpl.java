@@ -37,16 +37,16 @@ public class ImageWriteServiceImpl implements ImageWriteService {
     }
 
     @Override
-    public void checkImagePermissionByImageIdAndWriteToken(Long id, String writeToken) throws RollBackException {
+    public void checkImagePermissionByImageIdAndWriteToken(String id, String writeToken) throws RollBackException {
         if (id == null) throw new RollBackException("image_id is NULL");
-        if (id < 1) throw new RollBackException("image_id (" + id + ") is less that 1");
+        if (id.length() != 8) throw new RollBackException("image_id length  '"+id+"'(" + id.length() + ") != 8");
         if (writeToken == null) throw new RollBackException("token is NULL for image id=" + id);
         if (writeToken.isEmpty()) throw new RollBackException("token is EMPTY for image id=" + id);
         if (imageDao.countByImageIdAndWriteToken(id, writeToken) <1) throw new RollBackException("no image found with image_id=" + id + " and writeToken=" + writeToken);
     }
 
     @Override
-    public Long addImage(String token, MultipartFile mpf) throws RollBackException {
+    public String addImage(String token, MultipartFile mpf) throws RollBackException {
         Token checkedToken = tokenService.checkWriteToken(token);
         try {
             Image image = new Image(checkedToken.getId(),contentType(mpf), mpf.getOriginalFilename(), mpf.getSize());
@@ -62,7 +62,7 @@ public class ImageWriteServiceImpl implements ImageWriteService {
     }
 
     @Override
-    public void updateImage(Long id, String writeToken, MultipartFile mpf) throws RollBackException {
+    public void updateImage(String id, String writeToken, MultipartFile mpf) throws RollBackException {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         try {
             Image image = imageDao.findOne(id);
@@ -82,49 +82,49 @@ public class ImageWriteServiceImpl implements ImageWriteService {
     }
 
     @Override
-    public void deleteImage(Long id, String writeToken) throws RollBackException {
+    public void deleteImage(String id, String writeToken) throws RollBackException {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.delete(id);
     }
 
     @Override
-    public void setAvatar(Long id, String writeToken) throws RollBackException {
+    public void setAvatar(String id, String writeToken) throws RollBackException {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.avatar(id);
     }
 
     @Override
-    public void setTitle(Long id, String writeToken, String title) throws RollBackException {
+    public void setTitle(String id, String writeToken, String title) throws RollBackException {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.title(id, title);
     }
 
     @Override
-    public void setDescription(Long id, String rwToken, String description) throws RollBackException {
+    public void setDescription(String id, String rwToken, String description) throws RollBackException {
         checkImagePermissionByImageIdAndWriteToken(id, rwToken);
         imageDao.description(id, description);
     }
 
     @Override
-    public void sortIndexPlus(Long id, String writeToken) throws RollBackException  {
+    public void sortIndexPlus(String id, String writeToken) throws RollBackException  {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.sortIndexPlus(id);
     }
 
     @Override
-    public void sortIndexMinus(Long id, String writeToken) throws RollBackException  {
+    public void sortIndexMinus(String id, String writeToken) throws RollBackException  {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.sortIndexMinus(id);
     }
 
     @Override
-    public void sortIndexToFirst(Long id, String writeToken) throws RollBackException  {
+    public void sortIndexToFirst(String id, String writeToken) throws RollBackException  {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.sortIndexToFirst(id);
     }
 
     @Override
-    public void sortIndexToLast(Long id, String writeToken) throws RollBackException  {
+    public void sortIndexToLast(String id, String writeToken) throws RollBackException  {
         checkImagePermissionByImageIdAndWriteToken(id, writeToken);
         imageDao.sortIndexToLast(id);
     }

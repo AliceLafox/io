@@ -19,9 +19,7 @@ public interface ImageReadService {
     List<Image> getImages(Token token);
     List<Image> getImagesByReadToken(String readToken) throws RollBackException;
     Image getAvatarByReadToken(String readToken) throws RollBackException;
-    Image findOne(Long id);
-
-
-    byte[] getImageContent(Long id);
+    Image findOne(String id);
+    byte[] getImageContent(String id);
 
 }

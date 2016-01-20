@@ -22,9 +22,9 @@ public class ImageSortController {
     @Autowired
     ImageWriteService imageWriteService;
 
-    @RequestMapping(value = "sortIndex/{id:\\d+}", method = RequestMethod.POST)
+    @RequestMapping(value = "sortIndex/{id:[a-z0-9]{8}}", method = RequestMethod.POST)
     public Map<String, Object> sortIndex(
-            @PathVariable Long id,
+            @PathVariable String id,
             @RequestParam(defaultValue = "") String token,
             @RequestParam(defaultValue = "") String op) {
         Map<String, Object> map = new HashMap<>();

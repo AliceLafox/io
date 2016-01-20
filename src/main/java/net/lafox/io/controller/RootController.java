@@ -36,7 +36,7 @@ public class RootController {
     @Autowired
     ImageReadService imageReadService;
 
-    private static final String ETAG = "\"%d-w%d-h%d-o%s-v%d-q%d.%s\"";
+    private static final String ETAG = "\"%s-w%d-h%d-o%s-v%d-q%d.%s\"";
     private static final long EXP = ZonedDateTime.now().plusYears(1).toInstant().toEpochMilli();
     private static final Map<String, MediaType> TYPES = new HashMap<String, MediaType>() {{
         put("png", MediaType.IMAGE_PNG);
@@ -44,10 +44,10 @@ public class RootController {
         put("jpg", MediaType.IMAGE_JPEG);
     }};
 
-    @RequestMapping(value = "{id:\\d+}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d+}.{ext:png|jpg|gif}", method = RequestMethod.GET)
+    @RequestMapping(value = "{id:[a-z0-9]{8}}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d+}.{ext:png|jpg|gif}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<byte[]> imgNew(
-            @PathVariable long id,
+            @PathVariable String id,
             @PathVariable int w,
             @PathVariable int h,
             @PathVariable char op,
