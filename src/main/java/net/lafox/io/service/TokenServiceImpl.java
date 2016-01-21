@@ -20,12 +20,19 @@ public class TokenServiceImpl implements TokenService {
 
     @Autowired
     TokenDao tokenDao;
+    @Autowired
+    SiteService siteService;
 
     @Override
     public Token addToken(String siteName, String ownerName, Long ownerId, String ip) throws RollBackException {
 
-        if (siteName==null || siteName.isEmpty()|| ownerName==null || ownerName.isEmpty() || ownerId==null || ownerId==0)
+        if (siteName==null || siteName.isEmpty()|| ownerName==null || ownerName.isEmpty() || ownerId==null || ownerId==0) {
             throw new RollBackException("rejected: required parameters are empty");
+        }
+
+        if(!siteService.checkIp(siteName,ip)){
+            throw new RollBackException("rejected: IP '"+ip+"' not allowed");
+        }
 
         Token token = tokenDao.findBySiteNameAndOwnerNameAndOwnerId(siteName, ownerName, ownerId);
         if (token == null) {
