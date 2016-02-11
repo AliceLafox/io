@@ -9,7 +9,7 @@ angular.module('image')
     .constant('serviceUrl', 'http://localhost:8081')
 
     .value('initToken', {
-        siteName: 'angular-test',
+        siteName: 'test-domain',
         ownerName: 'item',
         ownerId: '1024',
         readToken: '',

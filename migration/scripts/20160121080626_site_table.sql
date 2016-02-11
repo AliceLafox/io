@@ -20,6 +20,7 @@ INSERT INTO site_ip (site_name, network)  VALUES ('test-domain','127.0.0.1/24');
 INSERT INTO site_ip (site_name, network)  VALUES ('test-domain','10.0.0.0/8');
 INSERT INTO site_ip (site_name, network)  VALUES ('test-domain','172.16.0.0/12');
 INSERT INTO site_ip (site_name, network)  VALUES ('test-domain','192.168.0.0/16');
+INSERT INTO site_ip (site_name, network)  VALUES ('test-domain','::1/24');
 
 ALTER TABLE site_ip
 ADD CONSTRAINT site_ip_site_name_fkey  FOREIGN KEY (site_name) REFERENCES site (name) ON UPDATE CASCADE ON DELETE RESTRICT;
