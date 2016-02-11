@@ -6,11 +6,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
-  <%--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">--%>
-  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <%--<link rel="stylesheet" href="/css/bootstrap.min.css">--%>
   <link rel="stylesheet" href="/css/app.css">
-  <%--<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>--%>
-  <script src="/js/angular.min.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js"></script>
+  <%--<script src="/js/angular.min.js"></script>--%>
 
   <%--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>--%>
   <%--<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>--%>
@@ -18,6 +18,7 @@
   <script src="/js/ng-file-upload.min.js"></script>
   <script src="/js/app.js"></script>
   <script src="/js/app-directives.js"></script>
+  <script src="/js/app-service.js"></script>
   <script src="/js/image-controller.js"></script>
 
   <meta charset="UTF-8">
@@ -25,7 +26,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <title></title>
 </head>
-<body ng-app="science">
+<body ng-app="image">
 <div class="page-header">
   <h1>Image REST project
     <small>{{"AngularJS Demo HTML page" | uppercase }}</small>
@@ -34,10 +35,11 @@
 </div>
 
 
-
 <token-register></token-register>
-<image-edit-gallery></image-edit-gallery>
 <image-uploader></image-uploader>
+
+<image-edit-gallery></image-edit-gallery>
+<update-title-description></update-title-description>
 
 </body>
 </html>

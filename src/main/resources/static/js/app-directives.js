@@ -3,7 +3,7 @@
  * Lafox.Net Software developers Team http://dev.lafox.net
  */
 
-angular.module('science')
+angular.module('image')
 
     .directive('imageUploader', function () {
         return {
@@ -44,6 +44,14 @@ angular.module('science')
             restrict: 'E',
             scope: {text: '@'},
             template: '<h3>{{text}}</h3>'
+        };
+    })
+    .directive('updateTitleDescription', function(){
+        return {
+            restrict: 'E',
+            templateUrl: '/templates/update-title-description.html',
+            controller: "ImageController",
+            controllerAs: 'imageCtrl'
         };
     })
 

@@ -3,33 +3,39 @@
  * Lafox.Net Software developers Team http://dev.lafox.net
  */
 
-angular.module('science')
-    .controller('ImageController', ['$http', '$scope', 'Upload', 'serviceUrl', 'initToken', function ($http, $scope, Upload, serviceUrl, initToken) {
+angular.module('image')
+    .controller('ImageController', ['$http', '$scope', 'Upload', 'serviceUrl', 'initToken', 'imageService', 'tokenService', function (
+            $http, 
+            $scope, 
+            Upload, 
+            serviceUrl, 
+            initToken,
+            imageService,
+            tokenService ) {
+        
         $scope.token = initToken;
+        var imageCtrl = this;
 
         $scope.getToken = function () {
-            $http({
-                method: 'POST',
-                url: serviceUrl+'/api/token/add',
-                params: $scope.token
-            }).success(function (data) {
-                $scope.token.readToken = data.readToken;
-                $scope.token.writeToken = data.writeToken;
+            tokenService.getToken($scope.token).then(function (response) {
+                $scope.token.readToken = response.data.readToken;
+                $scope.token.writeToken = response.data.writeToken;
                 $scope.loadImages();
             });
 
         };
 
         $scope.loadImages = function () {
-            $http.get(serviceUrl + '/image/list/' + $scope.token.readToken).success(function (data) {
-                $scope.images = data.images;
+            imageService.loadImages($scope.token.readToken).then(function (response) {
+                    $scope.images = response.data.images;
             });
         };
 
-        $scope.deleteImage = function (imageId) {
-            $http.delete(serviceUrl + '/image/delete/' + imageId, {params: {token: $scope.token.writeToken}})
-                .success(function (data) {
+        imageCtrl.deleteImage = function (imageId) {
+            imageService.delete(imageId, $scope.token.writeToken)
+                .then(function (response) {
                     $scope.loadImages();
+                    imageCtrl.cleanCurrentImage();
                 });
         };
 
@@ -52,5 +58,41 @@ angular.module('science')
             $scope.uploadFiles($scope.files);
             $scope.files = {};
         };
+
+
+        imageCtrl.cleanCurrentImage = function() {
+            imageCtrl.currentImage = null;
+            imageCtrl.editedImage = {};
+            imageCtrl.showUpdateTitleDesc=false;
+
+        }
+
+        imageCtrl.cleanCurrentImage();
+
+        imageCtrl.setCurrentImage = function(image) {
+            imageCtrl.currentImage = image;
+            imageCtrl.editedImage = angular.copy(imageCtrl.currentImage);
+            imageCtrl.showUpdateTitleDesc=true;
+        };
+
+
+        imageCtrl.updateTitle = function(){
+            imageService.updateTitle(imageCtrl.editedImage.id, imageCtrl.editedImage.title, $scope.token.writeToken)
+                .then(function successCallback (response) {
+                    $scope.loadImages();
+                }, function errorCallback (response) {
+                    console.log(response);
+                });
+        };
+
+        imageCtrl.updateDescription = function(){
+            imageService.updateDescription(imageCtrl.editedImage.id, imageCtrl.editedImage.description, $scope.token.writeToken)
+                .then(function successCallback (response) {
+                    $scope.loadImages();
+                }, function errorCallback (response) {
+                    console.log(response);
+                });
+        };
+
 
 }]);

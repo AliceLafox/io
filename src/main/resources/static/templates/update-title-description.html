@@ -1,0 +1,34 @@
+<div class="row" ng-show="imageCtrl.showUpdateTitleDesc">
+    <div class="col-lg-4">
+        <div class="panel panel-default" >
+            <div class="panel-heading">
+                <h3 class="panel-title">Current Image Edit: <strong># {{imageCtrl.editedImage.id}}</strong></h3>
+            </div>
+            <div class="panel-body">
+
+                <div class="input-group">
+                    <span class="input-group-addon">Title</span>
+                    <input type="text" placeholder="Title" ng-model="imageCtrl.editedImage.title"
+                           ng-required="false" ng-minlength="3" ng-maxlength="30"
+                           class="form-control" ng-change="imageCtrl.updateTitle()">
+                    <!--<span class="input-group-btn">-->
+                     <!--<button type="submit" class="btn btn-primary" ng-click="imageCtrl.updateTitle()">Set Title</button>-->
+                   <!--</span>-->
+                </div>
+
+                <div class="input-group">
+                    <span class="input-group-addon">Description</span>
+                    <input type="text" placeholder="Description" ng-model="imageCtrl.editedImage.description"
+                           ng-required="false" ng-minlength="3" ng-maxlength="30"
+                           class="form-control" ng-change="imageCtrl.updateDescription()">
+                    <!--<span class="input-group-btn">-->
+                       <!--<button type="submit" class="btn btn-primary" ng-click="imageCtrl.updateDescription()">Set description</button>-->
+                    <!--</span>-->
+                </div>
+                <button type="submit" class="btn btn-primary" ng-click="imageCtrl.deleteImage(imageCtrl.editedImage.id)">Delete without confirmation</button>
+            </div>
+
+
+        </div>
+    </div>
+</div>
