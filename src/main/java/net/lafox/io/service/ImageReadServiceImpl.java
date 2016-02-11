@@ -39,7 +39,7 @@ public class ImageReadServiceImpl implements ImageReadService {
     }
 
     @Override
-    public byte[] getImageContent(Long id) {
+    public byte[] getImageContent(String id) {
         return (byte[]) imageDao.getImageContent(id);
     }
 
@@ -53,8 +53,8 @@ public class ImageReadServiceImpl implements ImageReadService {
     }
 
     @Override
-    public Image findOne(Long id) {
-        if (id == null || id < 1) return null;
+    public Image findOne(String id) {
+        if (id == null ) return null;
         return imageDao.findOne(id);
     }
 

@@ -56,15 +56,15 @@ public interface ImageDao {
     Image findAvatarByReadToken(@Param("readToken") String readToken);
 
     @Select("SELECT " + SELECT_FIELDS + "FROM image i WHERE id=#{id}")
-    Image findOne(@Param("id")Long id);
+    Image findOne(@Param("id")String id);
 
     @Select("SELECT count(*) FROM image i " +
             " LEFT JOIN token t ON(i.token_id=t.id) " +
             " WHERE i.id=#{id} AND t.write_token=#{writeToken}")
-    Long countByImageIdAndWriteToken(@Param("id")Long id, @Param("writeToken")String writeToken);
+    Long countByImageIdAndWriteToken(@Param("id")String id, @Param("writeToken")String writeToken);
 
     @Select("SELECT content FROM image WHERE id=#{id}")
-    Object getImageContent(@Param("id")Long id);
+    Object getImageContent(@Param("id")String id);
 
     @Update("UPDATE image SET "+UPDATE_FIELDS + "WHERE id=#{id}")
     void update(Image image);
@@ -74,23 +74,23 @@ public interface ImageDao {
     void insert(Image image);
 
     @Delete("DELETE FROM image WHERE id=#{id}")
-    void delete(@Param("id")Long id);
+    void delete(@Param("id")String id);
 
     @Update("select setAvatar(#{id})")
-    void avatar(@Param("id")Long id);
+    void avatar(@Param("id")String id);
 
     @Update("UPDATE image SET title = #{title} WHERE id=#{id}")
-    void title(@Param("id")Long id, @Param("title") String title);
+    void title(@Param("id")String id, @Param("title") String title);
 
     @Update("UPDATE image SET description = #{description} WHERE id=#{id}")
-    void description(@Param("id")Long id, @Param("description") String description);
+    void description(@Param("id")String id, @Param("description") String description);
 
     @Update("select sort_index_plus(#{id})")
-    void sortIndexPlus(@Param("id")Long id);
+    void sortIndexPlus(@Param("id")String id);
     @Update("select sort_index_minus(#{id})")
-    void sortIndexMinus(@Param("id")Long id);
+    void sortIndexMinus(@Param("id")String id);
     @Update("select sort_index_to_first(#{id})")
-    void sortIndexToFirst(@Param("id")Long id);
+    void sortIndexToFirst(@Param("id")String id);
     @Update("select sort_index_to_last(#{id})")
-    void sortIndexToLast(@Param("id")Long id);
+    void sortIndexToLast(@Param("id")String id);
 }

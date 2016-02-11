@@ -95,7 +95,7 @@ public class ImageControllerTest {
         Image img = imageReadService.getImages(tokenService.findByWriteToken(token.getWriteToken())).get(1);
         byte[] imgContent = imageReadService.getImageContent(img.getId());
 
-//        "{id:\\d+}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d}.{ext:png|jpg|gif}"
+//        "{id:[a-z0-9]{8}}-w{w:\\d+}-h{h:\\d+}-o{op:[wheco]}-q{quality:\\d+}-v{ver:\\d}.{ext:png|jpg|gif}"
 
         mockMvc.perform(get("/" + img.getId() + "-w100-h100-oo-q50-v222.png"))
                 .andExpect(status().isOk())
@@ -164,7 +164,7 @@ public class ImageControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.avatar").isNotEmpty())
-                .andExpect(jsonPath("$.avatar.id").value(Integer.valueOf("" + img.getId())))
+                .andExpect(jsonPath("$.avatar.id").value(img.getId()))
         ;
     }
     @Test

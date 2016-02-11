@@ -15,7 +15,7 @@ import java.util.Date;
 public class Image implements Serializable {
 
     private static final long serialVersionUID = 679756698908629665L;
-    private Long id;
+    private String id;
 
     private int sortIndex;
     private int version;
@@ -75,11 +75,11 @@ public class Image implements Serializable {
         this.avatar = avatar;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

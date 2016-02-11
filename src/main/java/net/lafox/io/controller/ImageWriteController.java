@@ -32,8 +32,8 @@ public class ImageWriteController {
 
 
 
-    @RequestMapping(value = "update/{id:\\d+}", method = RequestMethod.POST)
-    public synchronized Map<String, Object> update(@PathVariable Long id,
+    @RequestMapping(value = "update/{id:[a-z0-9]{8}}", method = RequestMethod.POST)
+    public synchronized Map<String, Object> update(@PathVariable String id,
                                                    @RequestParam(defaultValue = "") String token,
                                                    @RequestParam(defaultValue = "") List<MultipartFile> data
     ) {
@@ -50,8 +50,8 @@ public class ImageWriteController {
         return map;
     }
 
-    @RequestMapping(value = "delete/{id:\\d+}", method = RequestMethod.DELETE)
-    public synchronized Map<String, Object> update(@PathVariable Long id,
+    @RequestMapping(value = "delete/{id:[a-z0-9]{8}}", method = RequestMethod.DELETE)
+    public synchronized Map<String, Object> update(@PathVariable String id,
                                                    @RequestParam(defaultValue = "") String token
 
     ) {
@@ -66,8 +66,8 @@ public class ImageWriteController {
         return map;
     }
 
-    @RequestMapping(value = "avatar/{id:\\d+}", method = RequestMethod.POST)
-    public synchronized Map<String, Object> avatar(@PathVariable Long id,
+    @RequestMapping(value = "avatar/{id:[a-z0-9]{8}}", method = RequestMethod.POST)
+    public synchronized Map<String, Object> avatar(@PathVariable String id,
                                                    @RequestParam(defaultValue = "") String token
 
     ) {
@@ -82,8 +82,8 @@ public class ImageWriteController {
         return map;
     }
 
-    @RequestMapping(value = "title/{id:\\d+}", method = RequestMethod.POST)
-    public synchronized Map<String, Object> setTitle(@PathVariable Long id,
+    @RequestMapping(value = "title/{id:[a-z0-9]{8}}", method = RequestMethod.POST)
+    public synchronized Map<String, Object> setTitle(@PathVariable String id,
                                                      @RequestParam(defaultValue = "") String token,
                                                      @RequestParam(defaultValue = "") String title
 
@@ -99,8 +99,8 @@ public class ImageWriteController {
         return map;
     }
 
-    @RequestMapping(value = "description/{id:\\d+}", method = RequestMethod.POST)
-    public synchronized Map<String, Object> setDescription(@PathVariable Long id,
+    @RequestMapping(value = "description/{id:[a-z0-9]{8}}", method = RequestMethod.POST)
+    public synchronized Map<String, Object> setDescription(@PathVariable String id,
                                                            @RequestParam(defaultValue = "") String token,
                                                            @RequestParam(defaultValue = "") String description
 
